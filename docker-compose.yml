@@ -1,0 +1,64 @@
+version: '3.8'
+
+services:
+  # MongoDB service
+  mongodb:
+    image: mongo:7
+    container_name: certstudy-mongodb
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password123
+      MONGO_INITDB_DATABASE: certstudy
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - certstudy-network
+
+  # Backend service
+  backend:
+    build: ./server
+    container_name: certstudy-backend
+    restart: unless-stopped
+    environment:
+      MONGODB_URI: mongodb://admin:password123@mongodb:27017/certstudy?authSource=admin
+      JWT_SECRET: development-jwt-secret-key-change-in-production
+      PORT: 3001
+      NODE_ENV: development
+    ports:
+      - "3001:3001"
+    depends_on:
+      - mongodb
+    networks:
+      - certstudy-network
+    volumes:
+      - ./server:/app
+      - /app/node_modules
+
+  # Frontend service (for development)
+  frontend:
+    build: 
+      context: ./client
+      dockerfile: Dockerfile.dev
+    container_name: certstudy-frontend
+    restart: unless-stopped
+    environment:
+      REACT_APP_API_URL: http://localhost:3001
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    networks:
+      - certstudy-network
+    volumes:
+      - ./client:/app
+      - /app/node_modules
+
+volumes:
+  mongodb_data:
+
+networks:
+  certstudy-network:
+    driver: bridge

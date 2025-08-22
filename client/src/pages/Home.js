@@ -1,17 +1,17 @@
-import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import axios from 'axios';
-import { useAuth } from '../contexts/AuthContext';
-import ArticleCard from '../components/ArticleCard';
-import CreateArticle from '../components/CreateArticle';
-import SearchBar from '../components/SearchBar';
+import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import axios from "axios";
+import { useAuth } from "../contexts/AuthContext";
+import ArticleCard from "../components/ArticleCard";
+import CreateArticle from "../components/CreateArticle";
+import SearchBar from "../components/SearchBar";
 
 const Home = () => {
   const { currentUser } = useAuth();
   const [articles, setArticles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showCreateForm, setShowCreateForm] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
@@ -24,18 +24,18 @@ const Home = () => {
       setLoading(true);
       const params = {
         page: currentPage,
-        limit: 10
+        limit: 10,
       };
-      
+
       if (searchTerm) {
         params.search = searchTerm;
       }
-      
-      const response = await axios.get('/api/articles', { params });
+
+      const response = await axios.get("/api/articles", { params });
       setArticles(response.data.articles);
       setTotalPages(response.data.totalPages);
     } catch (error) {
-      console.error('Error fetching articles:', error);
+      console.error("Error fetching articles:", error);
     } finally {
       setLoading(false);
     }
@@ -52,11 +52,13 @@ const Home = () => {
   };
 
   const handleLike = (articleId, newLikeCount, isLiked) => {
-    setArticles(articles.map(article => 
-      article._id === articleId 
-        ? { ...article, likes: Array(newLikeCount).fill(null) }
-        : article
-    ));
+    setArticles(
+      articles.map((article) =>
+        article._id === articleId
+          ? { ...article, likes: Array(newLikeCount).fill(null) }
+          : article
+      )
+    );
   };
 
   return (
@@ -69,9 +71,7 @@ const Home = () => {
         <p className="text-lg text-gray-600 mb-6">
           資格試験に関する知識や経験を共有しましょう
         </p>
-        
 
-        
         {!currentUser && (
           <div className="space-x-4">
             <Link
@@ -90,18 +90,16 @@ const Home = () => {
         )}
       </div>
 
-
-
       {/* Articles Section */}
       <div>
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold">記事一覧</h2>
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 space-y-2 sm:space-y-0 sm:space-x-4">
+          <h2 className="text-xl font-bold mr-4">記事一覧</h2>
           {currentUser && (
             <button
               onClick={() => setShowCreateForm(!showCreateForm)}
-              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 w-full sm:w-auto"
             >
-              {showCreateForm ? 'キャンセル' : '記事を作成'}
+              {showCreateForm ? "キャンセル" : "記事を作成"}
             </button>
           )}
         </div>
@@ -142,13 +140,15 @@ const Home = () => {
                 >
                   前へ
                 </button>
-                
+
                 <span className="px-4 py-2 text-gray-600">
                   {currentPage} / {totalPages}
                 </span>
-                
+
                 <button
-                  onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+                  onClick={() =>
+                    setCurrentPage(Math.min(totalPages, currentPage + 1))
+                  }
                   disabled={currentPage === totalPages}
                   className="px-4 py-2 border rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
                 >
@@ -159,12 +159,12 @@ const Home = () => {
           </>
         ) : (
           <div className="text-center py-8 text-gray-600">
-            {searchTerm ? '検索結果が見つかりませんでした。' : 'まだ記事がありません。'}
+            {searchTerm
+              ? "検索結果が見つかりませんでした。"
+              : "まだ記事がありません。"}
           </div>
         )}
       </div>
-
-
     </div>
   );
 };

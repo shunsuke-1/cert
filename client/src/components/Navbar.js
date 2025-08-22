@@ -1,6 +1,6 @@
-import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
+import React from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
 
 const Navbar = () => {
   const { currentUser, logout } = useAuth();
@@ -8,19 +8,26 @@ const Navbar = () => {
 
   const handleLogout = () => {
     logout();
-    navigate('/');
+    navigate("/");
   };
 
   return (
     <nav className="bg-blue-600 text-white shadow-lg">
       <div className="container mx-auto px-4">
+        {/* flexを縦→横に切り替え、縦方向の間隔(space-y)を設定 */}
         <div className="flex flex-col sm:flex-row justify-between items-center py-4 space-y-4 sm:space-y-0">
-          <Link to="/" className="text-xl font-bold">資格試験コミュニティ</Link>
+          <Link to="/" className="text-xl font-bold">
+            資格試験コミュニティ
+          </Link>
+
+          {/* メニュー全体を縦→横に切り替え、ボタン間の間隔を調整 */}
           <div className="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-6">
             {currentUser ? (
               <>
                 <div className="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-4">
-                  <Link to="/profile" className="hover:text-blue-200">{currentUser.username}</Link>
+                  <Link to="/profile" className="hover:text-blue-200">
+                    {currentUser.username}
+                  </Link>
                   <button
                     onClick={handleLogout}
                     className="bg-blue-700 px-3 py-1 rounded hover:bg-blue-800 w-full sm:w-auto"
@@ -32,7 +39,12 @@ const Navbar = () => {
             ) : (
               <>
                 <div className="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-3">
-                  <Link to="/login" className="hover:text-blue-200 w-full sm:w-auto">ログイン</Link>
+                  <Link
+                    to="/login"
+                    className="hover:text-blue-200 w-full sm:w-auto"
+                  >
+                    ログイン
+                  </Link>
                   <Link
                     to="/register"
                     className="bg-blue-700 px-3 py-1 rounded hover:bg-blue-800 w-full sm:w-auto text-center"

@@ -14,13 +14,14 @@ const Navbar = () => {
   return (
     <nav className="bg-blue-600 text-white shadow-lg">
       <div className="container mx-auto px-4">
-        {/* flexを縦→横に切り替え、縦方向の間隔(space-y)を設定 */}
+        {/* 上段: サイトタイトルとメニュー全体 */}
         <div className="flex flex-col sm:flex-row justify-between items-center py-4 space-y-4 sm:space-y-0">
+          {/* サイトタイトル */}
           <Link to="/" className="text-xl font-bold">
             Shikaku
           </Link>
 
-          {/* メニュー全体を縦→横に切り替え、ボタン間の間隔を調整 */}
+          {/* メニュー: ログイン/登録 または プロフィール/ログアウト + プライバシーポリシー */}
           <div className="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-6">
             {currentUser ? (
               <>
@@ -54,6 +55,13 @@ const Navbar = () => {
                 </div>
               </>
             )}
+            {/* プライバシーポリシーへのリンク */}
+            <Link
+              to="/privacy-policy"
+              className="hover:text-blue-200 w-full sm:w-auto sm:ml-4 mt-2 sm:mt-0"
+            >
+              プライバシーポリシー
+            </Link>
           </div>
         </div>
       </div>

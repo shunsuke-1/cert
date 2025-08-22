@@ -16,14 +16,14 @@ const SearchBar = ({ onSearch, placeholder = "記事を検索..." }) => {
   return (
     <form
       onSubmit={handleSubmit}
-      className="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-2"
+      className="flex flex-col sm:flex-row items-center gap-2"
     >
       <input
         type="text"
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
         placeholder={placeholder}
-        className="w-full px-4 py-2 pl-10 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
+        className="w-full sm:flex-1 px-4 py-2 pl-10 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
       />
       <button
         type="submit"

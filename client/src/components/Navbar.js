@@ -17,7 +17,7 @@ const Navbar = () => {
         {/* flexを縦→横に切り替え、縦方向の間隔(space-y)を設定 */}
         <div className="flex flex-col sm:flex-row justify-between items-center py-4 space-y-4 sm:space-y-0">
           <Link to="/" className="text-xl font-bold">
-            資格試験コミュニティ
+            Shikaku
           </Link>
 
           {/* メニュー全体を縦→横に切り替え、ボタン間の間隔を調整 */}

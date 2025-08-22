@@ -65,11 +65,9 @@ const Home = () => {
     <div className="max-w-4xl mx-auto">
       {/* Header Section */}
       <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-4">
-          資格試験コミュニティ
-        </h1>
+        <h1 className="text-3xl font-bold text-gray-900 mb-4">Shikaku</h1>
         <p className="text-lg text-gray-600 mb-6">
-          資格試験に関する知識や経験を共有しましょう
+          資格試験に関する知識や経験を共有しよう！
         </p>
 
         {!currentUser && (

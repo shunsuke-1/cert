@@ -26,10 +26,11 @@ const authLimiter = rateLimit({
 });
 app.use('/api/auth/login', authLimiter);
 app.use('/api/auth/register', authLimiter);
-();
+
 
 // Middleware
 const allowedOrigins = [process.env.FRONTEND_URL || "http://localhost:3000"];
+
 app.use(
   cors({
     origin: allowedOrigins,
@@ -50,7 +51,10 @@ mongoose
   .then(() => console.log("Connected to MongoDB"))
   .catch((err) => console.error("MongoDB connection error:", err));
 
+
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
-});
+})
+
+

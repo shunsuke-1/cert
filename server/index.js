@@ -8,17 +8,17 @@ const mongoSanitize = require('express-mongo-sanitize');
 const rateLimit = require('express-rate-limit');
 const cookieParser = require('cookie-parser');
 
-
 const authRoutes = require("./routes/auth");
 const userRoutes = require("./routes/users");
 const articleRoutes = require("./routes/articles");
 const commentRoutes = require("./routes/comments");
 
-const app = express
-  app.use(helmet());
+const app = express();
+app.use(helmet());
 app.use(xssClean());
 app.use(mongoSanitize());
 app.use(cookieParser());
+
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 10,
@@ -27,10 +27,8 @@ const authLimiter = rateLimit({
 app.use('/api/auth/login', authLimiter);
 app.use('/api/auth/register', authLimiter);
 
-
 // Middleware
 const allowedOrigins = [process.env.FRONTEND_URL || "http://localhost:3000"];
-
 app.use(
   cors({
     origin: allowedOrigins,
@@ -51,10 +49,7 @@ mongoose
   .then(() => console.log("Connected to MongoDB"))
   .catch((err) => console.error("MongoDB connection error:", err));
 
-
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
-})
-
-
+});

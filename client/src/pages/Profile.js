@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
+import api from "../api";
 import { useAuth } from "../contexts/AuthContext";
 import CreateArticle from "../components/CreateArticle";
 
@@ -32,7 +32,7 @@ const Profile = () => {
   const fetchMyArticles = async () => {
     try {
       setLoading(true);
-      const response = await axios.get("/api/articles/my-articles", {
+      const response = await api.get("/api/articles/my-articles", {
         params: { page: currentPage, limit: 10 },
       });
       setArticles(response.data.articles);
@@ -46,8 +46,8 @@ const Profile = () => {
 
   const fetchUserStats = async () => {
     try {
-      const userId = currentUser.id || currentUser._id; // id が無い場合は _id を使う
-      const response = await axios.get(`/api/users/stats/${userId}`);
+      const userId = currentUser.id || currentUser._id;
+      const response = await api.get(`/api/users/stats/${userId}`);
       setStats(response.data);
     } catch (error) {
       console.error("Error fetching user stats:", error);
@@ -57,16 +57,15 @@ const Profile = () => {
   const handleArticleCreated = (newArticle) => {
     setArticles([newArticle, ...articles]);
     setShowCreateForm(false);
-    fetchUserStats(); // Refresh stats
+    fetchUserStats();
   };
 
   const handleDeleteArticle = async (articleId) => {
     if (!window.confirm("この記事を削除しますか？")) return;
-
     try {
-      await axios.delete(`/api/articles/${articleId}`);
+      await api.delete(`/api/articles/${articleId}`);
       setArticles(articles.filter((article) => article._id !== articleId));
-      fetchUserStats(); // Refresh stats
+      fetchUserStats();
     } catch (error) {
       console.error("Error deleting article:", error);
       alert("記事の削除に失敗しました");
@@ -75,9 +74,8 @@ const Profile = () => {
 
   const handleSave = async () => {
     try {
-      await axios.put("/api/users/profile", { profile });
+      await api.put("/api/users/profile", { profile });
       setIsEditing(false);
-      // Optionally refresh user data or show success message
     } catch (error) {
       console.error("Error updating profile:", error);
       alert("プロフィールの更新に失敗しました");
@@ -365,7 +363,7 @@ const Profile = () => {
 
                       <div className="flex items-center space-x-4 text-sm text-gray-500">
                         <span>投稿日: {formatDate(article.createdAt)}</span>
-                        <span>👁 {article.views || 0} 閲覧</span>
+                        <span> {article.views || 0} 閲覧</span>
                         <span>❤️ {article.likes?.length || 0} いいね</span>
                         {article.updatedAt !== article.createdAt && (
                           <span>更新日: {formatDate(article.updatedAt)}</span>
@@ -408,11 +406,9 @@ const Profile = () => {
                 >
                   前へ
                 </button>
-
                 <span className="px-4 py-2 text-gray-600">
                   {currentPage} / {totalPages}
                 </span>
-
                 <button
                   onClick={() =>
                     setCurrentPage(Math.min(totalPages, currentPage + 1))
@@ -427,7 +423,7 @@ const Profile = () => {
           </>
         ) : (
           <div className="text-center py-12 bg-gray-50 rounded-lg">
-            <div className="text-gray-400 text-6xl mb-4">📝</div>
+            <div className="text-gray-400 text-6xl mb-4"></div>
             <h3 className="text-lg font-medium text-gray-900 mb-2">
               まだ記事がありません
             </h3>

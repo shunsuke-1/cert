@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import axios from "axios";
+import api from "../api";
 import { useAuth } from "../contexts/AuthContext";
 import ArticleCard from "../components/ArticleCard";
 import CreateArticle from "../components/CreateArticle";
@@ -26,12 +26,10 @@ const Home = () => {
         page: currentPage,
         limit: 10,
       };
-
       if (searchTerm) {
         params.search = searchTerm;
       }
-
-      const response = await axios.get("/api/articles", { params });
+      const response = await api.get("/api/articles", { params });
       setArticles(response.data.articles);
       setTotalPages(response.data.totalPages);
     } catch (error) {
@@ -91,7 +89,7 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Articles section (SearchBar + list + pagination) */}
+      {/* Articles section */}
       <section className="max-w-4xl mx-auto px-4 py-12">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 space-y-2 sm:space-y-0 sm:space-x-4">
           <h2 className="text-2xl font-bold text-gray-900">記事一覧</h2>
@@ -117,7 +115,42 @@ const Home = () => {
         )}
 
         {/* 記事リスト + ページネーション */}
-        {/* ここは元のコードと同様に実装 */}
+        {loading ? (
+          <p>記事を読み込み中...</p>
+        ) : (
+          <>
+            {articles.map((article) => (
+              <ArticleCard
+                key={article._id}
+                article={article}
+                onLike={handleLike}
+              />
+            ))}
+            {totalPages > 1 && (
+              <div className="flex justify-center mt-6 space-x-2">
+                <button
+                  onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                  disabled={currentPage === 1}
+                  className="px-4 py-2 border rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+                >
+                  前へ
+                </button>
+                <span className="px-4 py-2 text-gray-600">
+                  {currentPage} / {totalPages}
+                </span>
+                <button
+                  onClick={() =>
+                    setCurrentPage(Math.min(totalPages, currentPage + 1))
+                  }
+                  disabled={currentPage === totalPages}
+                  className="px-4 py-2 border rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+                >
+                  次へ
+                </button>
+              </div>
+            )}
+          </>
+        )}
       </section>
     </div>
   );

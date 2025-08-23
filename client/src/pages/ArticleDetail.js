@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import axios from "axios";
+import api from "../api";
 import { useAuth } from "../contexts/AuthContext";
 import Comments from "../components/Comments";
 import { Link } from "react-router-dom";
@@ -15,12 +15,13 @@ const ArticleDetail = () => {
 
   useEffect(() => {
     fetchArticle();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
   const fetchArticle = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`/api/articles/${id}`);
+      const response = await api.get(`/api/articles/${id}`);
       setArticle(response.data);
     } catch (error) {
       setError("記事が見つかりませんでした");
@@ -31,9 +32,8 @@ const ArticleDetail = () => {
 
   const handleLike = async () => {
     if (!currentUser) return;
-
     try {
-      const response = await axios.post(`/api/articles/${id}/like`);
+      const response = await api.post(`/api/articles/${id}/like`);
       setArticle({
         ...article,
         likes: Array(response.data.likes).fill(null),
@@ -45,24 +45,22 @@ const ArticleDetail = () => {
 
   const handleDelete = async () => {
     if (!window.confirm("この記事を削除しますか？")) return;
-
     try {
-      await axios.delete(`/api/articles/${id}`);
+      await api.delete(`/api/articles/${id}`);
       navigate("/");
     } catch (error) {
       console.error("Error deleting article:", error);
     }
   };
 
-  const formatDate = (date) => {
-    return new Date(date).toLocaleDateString("ja-JP", {
+  const formatDate = (date) =>
+    new Date(date).toLocaleDateString("ja-JP", {
       year: "numeric",
       month: "long",
       day: "numeric",
       hour: "2-digit",
       minute: "2-digit",
     });
-  };
 
   if (loading) {
     return (
@@ -116,7 +114,7 @@ const ArticleDetail = () => {
                 </Link>
               </span>
               <span>{formatDate(article.createdAt)}</span>
-              <span>👁 {article.views} 閲覧</span>
+              <span> {article.views} 閲覧</span>
             </div>
 
             {isAuthor && (
@@ -168,12 +166,11 @@ const ArticleDetail = () => {
                       : "bg-gray-100 text-gray-600 hover:bg-gray-200"
                   }`}
                 >
-                  <span>{isLiked ? "❤️" : "🤍"}</span>
+                  <span>{isLiked ? "❤️" : ""}</span>
                   <span>{article.likes?.length || 0}</span>
                 </button>
               )}
             </div>
-
             <div className="text-sm text-gray-500">
               {article.updatedAt !== article.createdAt && (
                 <span>最終更新: {formatDate(article.updatedAt)}</span>

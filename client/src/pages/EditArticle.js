@@ -1,26 +1,27 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import { useAuth } from '../contexts/AuthContext';
-import RichTextEditor from '../components/RichTextEditor';
+import React, { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import api from "../api";
+import { useAuth } from "../contexts/AuthContext";
+import RichTextEditor from "../components/RichTextEditor";
 
 const EditArticle = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { currentUser } = useAuth();
+
   const [formData, setFormData] = useState({
-    title: '',
-    content: '',
-    tags: []
+    title: "",
+    content: "",
+    tags: [],
   });
-  const [tagInput, setTagInput] = useState('');
+  const [tagInput, setTagInput] = useState("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
   useEffect(() => {
     if (!currentUser) {
-      navigate('/login');
+      navigate("/login");
       return;
     }
     fetchArticle();
@@ -29,22 +30,22 @@ const EditArticle = () => {
   const fetchArticle = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`/api/articles/${id}`);
+      const response = await api.get(`/api/articles/${id}`);
       const article = response.data;
-      
+
       // Check if user is the author
       if (article.author._id !== currentUser.id) {
-        navigate('/');
+        navigate("/");
         return;
       }
-      
+
       setFormData({
         title: article.title,
         content: article.content,
-        tags: article.tags || []
+        tags: article.tags || [],
       });
     } catch (error) {
-      setError('記事が見つかりませんでした');
+      setError("記事が見つかりませんでした");
     } finally {
       setLoading(false);
     }
@@ -52,42 +53,41 @@ const EditArticle = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!formData.title.trim() || !formData.content.trim()) {
-      setError('タイトルと内容は必須です');
+      setError("タイトルと内容は必須です");
       return;
     }
 
     try {
       setSaving(true);
-      setError('');
-      
-      await axios.put(`/api/articles/${id}`, formData);
+      setError("");
+      await api.put(`/api/articles/${id}`, formData);
       navigate(`/articles/${id}`);
     } catch (error) {
-      setError(error.response?.data?.message || '記事の更新に失敗しました');
+      setError(error.response?.data?.message || "記事の更新に失敗しました");
     } finally {
       setSaving(false);
     }
   };
 
   const handleAddTag = (e) => {
-    if (e.key === 'Enter' && tagInput.trim()) {
+    if (e.key === "Enter" && tagInput.trim()) {
       e.preventDefault();
       if (!formData.tags.includes(tagInput.trim())) {
         setFormData({
           ...formData,
-          tags: [...formData.tags, tagInput.trim()]
+          tags: [...formData.tags, tagInput.trim()],
         });
       }
-      setTagInput('');
+      setTagInput("");
     }
   };
 
   const removeTag = (tagToRemove) => {
     setFormData({
       ...formData,
-      tags: formData.tags.filter(tag => tag !== tagToRemove)
+      tags: formData.tags.filter((tag) => tag !== tagToRemove),
     });
   };
 
@@ -105,7 +105,7 @@ const EditArticle = () => {
       <div className="max-w-4xl mx-auto text-center py-8">
         <p className="text-red-600">{error}</p>
         <button
-          onClick={() => navigate('/my-page')}
+          onClick={() => navigate("/my-page")}
           className="mt-4 text-blue-600 hover:underline"
         >
           マイページに戻る
@@ -132,7 +132,7 @@ const EditArticle = () => {
             {error}
           </div>
         )}
-        
+
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
             <label className="block text-gray-700 text-sm font-bold mb-2">
@@ -141,7 +141,9 @@ const EditArticle = () => {
             <input
               type="text"
               value={formData.title}
-              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, title: e.target.value })
+              }
               className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500"
               placeholder="記事のタイトルを入力してください"
               maxLength={200}
@@ -171,7 +173,6 @@ const EditArticle = () => {
               className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500"
               placeholder="タグを入力してEnterキーを押してください"
             />
-            
             {formData.tags.length > 0 && (
               <div className="flex flex-wrap gap-2 mt-2">
                 {formData.tags.map((tag, index) => (
@@ -199,7 +200,7 @@ const EditArticle = () => {
               disabled={saving}
               className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 disabled:opacity-50"
             >
-              {saving ? '更新中...' : '記事を更新'}
+              {saving ? "更新中..." : "記事を更新"}
             </button>
             <button
               type="button"

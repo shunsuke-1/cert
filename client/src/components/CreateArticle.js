@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import axios from "axios";
+import api from "../api";
 import RichTextEditor from "./RichTextEditor";
 
 const CreateArticle = ({ onArticleCreated, onCancel }) => {
@@ -23,11 +23,8 @@ const CreateArticle = ({ onArticleCreated, onCancel }) => {
     try {
       setLoading(true);
       setError("");
-
-      const response = await axios.post("/api/articles", formData);
+      const response = await api.post("/api/articles", formData);
       onArticleCreated(response.data);
-
-      // Reset form
       setFormData({ title: "", content: "", tags: [] });
       setTagInput("");
     } catch (error) {
@@ -60,13 +57,11 @@ const CreateArticle = ({ onArticleCreated, onCancel }) => {
   return (
     <div className="bg-white rounded-lg shadow-md p-6 mb-6">
       <h2 className="text-xl font-semibold mb-4">新しい記事を作成</h2>
-
       {error && (
         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
           {error}
         </div>
       )}
-
       <form onSubmit={handleSubmit}>
         <div className="mb-4">
           <label className="block text-gray-700 text-sm font-bold mb-2">
@@ -84,7 +79,6 @@ const CreateArticle = ({ onArticleCreated, onCancel }) => {
             required
           />
         </div>
-
         <div className="mb-4">
           <label className="block text-gray-700 text-sm font-bold mb-2">
             内容
@@ -94,7 +88,6 @@ const CreateArticle = ({ onArticleCreated, onCancel }) => {
             onChange={(content) => setFormData({ ...formData, content })}
           />
         </div>
-
         <div className="mb-6">
           <label className="block text-gray-700 text-sm font-bold mb-2">
             タグ
@@ -107,7 +100,6 @@ const CreateArticle = ({ onArticleCreated, onCancel }) => {
             className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500"
             placeholder="タグを入力してEnterキーを押してください"
           />
-
           {formData.tags.length > 0 && (
             <div className="flex flex-wrap gap-2 mt-2">
               {formData.tags.map((tag, index) => (
@@ -128,11 +120,11 @@ const CreateArticle = ({ onArticleCreated, onCancel }) => {
             </div>
           )}
         </div>
-
         <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
           <button
             type="submit"
             className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 w-full sm:w-auto"
+            disabled={loading}
           >
             {loading ? "投稿中..." : "記事を投稿"}
           </button>

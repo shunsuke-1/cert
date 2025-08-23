@@ -114,58 +114,86 @@ const Home = () => {
           )}
         </div>
 
-        {/* 作成フォーム表示中は検索バー・一覧を隠す */}
-        {showCreateForm ? (
-          <CreateArticle
-            onArticleCreated={handleArticleCreated}
-            onCancel={() => setShowCreateForm(false)}
-          />
+        {/* 記事作成フォーム */}
+        {showCreateForm && (
+          <div className="mb-12">
+            <CreateArticle
+              onArticleCreated={handleArticleCreated}
+              onCancel={() => setShowCreateForm(false)}
+            />
+          </div>
+        )}
+
+        {/* 検索バー */}
+        <SearchBar onSearch={handleSearch} />
+
+        {/* 記事リスト */}
+        {loading ? (
+          <div className="flex justify-center items-center py-12">
+            <div className="card-modern p-8 text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
+              <p className="text-gray-600 text-lg">記事を読み込み中...</p>
+            </div>
+          </div>
+        ) : articles.length === 0 ? (
+          <div className="text-center py-12">
+            <div className="card-modern p-12">
+              <div className="text-6xl mb-4">📚</div>
+              <h3 className="text-2xl font-display font-semibold text-gray-900 mb-2">
+                {searchTerm ? "検索結果が見つかりません" : "まだ記事がありません"}
+              </h3>
+              <p className="text-gray-600 mb-6">
+                {searchTerm 
+                  ? "別のキーワードで検索してみてください" 
+                  : "最初の記事を投稿してコミュニティを始めましょう！"
+                }
+              </p>
+              {!searchTerm && currentUser && !showCreateForm && (
+                <button
+                  onClick={() => setShowCreateForm(true)}
+                  className="btn-primary px-6 py-3"
+                >
+                  ✨ 最初の記事を作成
+                </button>
+              )}
+            </div>
+          </div>
         ) : (
           <>
-            {/* 検索バー */}
-            <SearchBar onSearch={handleSearch} />
-
-            {/* 記事リスト */}
-            {loading ? (
-              <p>記事を読み込み中...</p>
-            ) : (
-              <>
-                {articles.map((article) => (
-                  <ArticleCard
-                    key={article._id}
-                    article={article}
-                    onLike={handleLike}
-                  />
-                ))}
-                {/* ページネーション */}
-                {totalPages > 1 && (
-                  <div className="flex justify-center mt-12">
-                    <div className="card-modern p-4 flex items-center space-x-4">
-                      <button
-                        onClick={() =>
-                          setCurrentPage(Math.max(1, currentPage - 1))
-                        }
-                        disabled={currentPage === 1}
-                        className="px-6 py-2 rounded-lg border-2 border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed hover:border-purple-400 hover:bg-purple-50 transition-all duration-200 font-medium text-gray-700"
-                      >
-                        ← 前へ
-                      </button>
-                      <span className="px-4 py-2 text-gray-700 font-semibold">
-                        {currentPage} / {totalPages}
-                      </span>
-                      <button
-                        onClick={() =>
-                          setCurrentPage(Math.min(totalPages, currentPage + 1))
-                        }
-                        disabled={currentPage === totalPages}
-                        className="px-6 py-2 rounded-lg border-2 border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed hover:border-purple-400 hover:bg-purple-50 transition-all duration-200 font-medium text-gray-700"
-                      >
-                        次へ →
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </>
+            {articles.map((article) => (
+              <ArticleCard
+                key={article._id}
+                article={article}
+                onLike={handleLike}
+              />
+            ))}
+            {/* ページネーション */}
+            {totalPages > 1 && (
+              <div className="flex justify-center mt-12">
+                <div className="card-modern p-4 flex items-center space-x-4">
+                  <button
+                    onClick={() =>
+                      setCurrentPage(Math.max(1, currentPage - 1))
+                    }
+                    disabled={currentPage === 1}
+                    className="px-6 py-2 rounded-lg border-2 border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed hover:border-purple-400 hover:bg-purple-50 transition-all duration-200 font-medium text-gray-700"
+                  >
+                    ← 前へ
+                  </button>
+                  <span className="px-4 py-2 text-gray-700 font-semibold">
+                    {currentPage} / {totalPages}
+                  </span>
+                  <button
+                    onClick={() =>
+                      setCurrentPage(Math.min(totalPages, currentPage + 1))
+                    }
+                    disabled={currentPage === totalPages}
+                    className="px-6 py-2 rounded-lg border-2 border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed hover:border-purple-400 hover:bg-purple-50 transition-all duration-200 font-medium text-gray-700"
+                  >
+                    次へ →
+                  </button>
+                </div>
+              </div>
             )}
           </>
         )}

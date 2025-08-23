@@ -55,11 +55,23 @@ const CreateArticle = ({ onArticleCreated, onCancel }) => {
   };
 
   return (
-    <div className="card-modern p-8 mb-8">
-      <h2 className="text-3xl font-display font-bold text-gray-900 mb-6">新しい記事を作成</h2>
+    <div className="card-modern p-8 mb-8 border-l-4 border-purple-500 bg-gradient-to-r from-purple-50/50 to-blue-50/50">
+      <div className="flex items-center mb-6">
+        <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full flex items-center justify-center mr-4">
+          <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+          </svg>
+        </div>
+        <h2 className="text-3xl font-display font-bold text-gray-900">新しい記事を作成</h2>
+      </div>
       {error && (
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-          {error}
+        <div className="bg-red-50 border-l-4 border-red-400 text-red-700 px-6 py-4 rounded-r-lg mb-6">
+          <div className="flex items-center">
+            <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+            </svg>
+            {error}
+          </div>
         </div>
       )}
       <form onSubmit={handleSubmit}>

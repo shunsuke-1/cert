@@ -247,3 +247,39 @@ code {
 .animation-delay-4000 {
   animation-delay: 4s;
 }
+
+/* Mobile-specific improvements */
+@media (max-width: 640px) {
+  /* Ensure minimum touch target size */
+  button, .btn-primary, .btn-secondary {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  /* Better spacing for mobile */
+  .card-modern {
+    margin-left: -0.5rem;
+    margin-right: -0.5rem;
+    border-radius: 16px;
+  }
+  
+  /* Improve text readability on mobile */
+  .text-gradient {
+    -webkit-text-stroke: 0.5px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Better form inputs on mobile */
+  input, textarea {
+    font-size: 16px; /* Prevents zoom on iOS */
+  }
+  
+  /* Optimize rich text editor for mobile */
+  .rich-text-editor .ql-toolbar {
+    padding: 8px;
+  }
+  
+  .rich-text-editor .ql-editor {
+    min-height: 120px;
+    padding: 12px;
+  }
+}

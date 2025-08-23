@@ -14,43 +14,43 @@ const Navbar = () => {
   return (
     <nav className="glass-dark text-white shadow-xl sticky top-0 z-50 border-b border-white/10">
       <div className="container mx-auto px-4">
-        <div className="flex justify-between items-center py-6">
+        <div className="flex justify-between items-center py-4 sm:py-6">
           <Link
             to="/"
-            className="text-3xl sm:text-4xl font-display font-bold text-gradient-accent hover:scale-105 transition-transform duration-300"
+            className="text-2xl sm:text-3xl lg:text-4xl font-display font-bold text-gradient-accent hover:scale-105 transition-transform duration-300"
           >
             Shikaku
           </Link>
 
           {currentUser ? (
-            <div className="flex items-center space-x-6">
+            <div className="flex items-center space-x-3 sm:space-x-6">
               <Link 
                 to="/profile" 
                 className="text-white/95 hover:text-white font-medium transition-colors duration-200 flex items-center space-x-2"
               >
-                <div className="w-8 h-8 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full flex items-center justify-center text-sm font-bold">
+                <div className="w-7 h-7 sm:w-8 sm:h-8 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full flex items-center justify-center text-xs sm:text-sm font-bold">
                   {currentUser.username.charAt(0).toUpperCase()}
                 </div>
-                <span className="hidden sm:block">{currentUser.username}</span>
+                <span className="hidden sm:block text-sm sm:text-base">{currentUser.username}</span>
               </Link>
               <button
                 onClick={handleLogout}
-                className="btn-secondary text-sm"
+                className="btn-secondary text-xs sm:text-sm px-3 sm:px-4 py-1.5 sm:py-2"
               >
                 ログアウト
               </button>
             </div>
           ) : (
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-2 sm:space-x-4">
               <Link 
                 to="/login" 
-                className="text-white/95 hover:text-white font-medium transition-colors duration-200"
+                className="text-white/95 hover:text-white font-medium transition-colors duration-200 text-sm sm:text-base"
               >
                 ログイン
               </Link>
               <Link
                 to="/register"
-                className="btn-primary text-sm"
+                className="btn-primary text-xs sm:text-sm px-3 sm:px-4 py-1.5 sm:py-2"
               >
                 新規登録
               </Link>

@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import { useAuth } from '../contexts/AuthContext';
-import Comments from '../components/Comments';
+import React, { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import axios from "axios";
+import { useAuth } from "../contexts/AuthContext";
+import Comments from "../components/Comments";
+import { Link } from "react-router-dom";
 
 const ArticleDetail = () => {
   const { id } = useParams();
@@ -10,7 +11,7 @@ const ArticleDetail = () => {
   const { currentUser } = useAuth();
   const [article, setArticle] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
   useEffect(() => {
     fetchArticle();
@@ -22,7 +23,7 @@ const ArticleDetail = () => {
       const response = await axios.get(`/api/articles/${id}`);
       setArticle(response.data);
     } catch (error) {
-      setError('記事が見つかりませんでした');
+      setError("記事が見つかりませんでした");
     } finally {
       setLoading(false);
     }
@@ -30,36 +31,36 @@ const ArticleDetail = () => {
 
   const handleLike = async () => {
     if (!currentUser) return;
-    
+
     try {
       const response = await axios.post(`/api/articles/${id}/like`);
       setArticle({
         ...article,
-        likes: Array(response.data.likes).fill(null)
+        likes: Array(response.data.likes).fill(null),
       });
     } catch (error) {
-      console.error('Error liking article:', error);
+      console.error("Error liking article:", error);
     }
   };
 
   const handleDelete = async () => {
-    if (!window.confirm('この記事を削除しますか？')) return;
-    
+    if (!window.confirm("この記事を削除しますか？")) return;
+
     try {
       await axios.delete(`/api/articles/${id}`);
-      navigate('/');
+      navigate("/");
     } catch (error) {
-      console.error('Error deleting article:', error);
+      console.error("Error deleting article:", error);
     }
   };
 
   const formatDate = (date) => {
-    return new Date(date).toLocaleDateString('ja-JP', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
+    return new Date(date).toLocaleDateString("ja-JP", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
     });
   };
 
@@ -77,7 +78,7 @@ const ArticleDetail = () => {
       <div className="max-w-4xl mx-auto text-center py-8">
         <p className="text-red-600">{error}</p>
         <button
-          onClick={() => navigate('/')}
+          onClick={() => navigate("/")}
           className="mt-4 text-blue-600 hover:underline"
         >
           ホームに戻る
@@ -94,7 +95,7 @@ const ArticleDetail = () => {
   return (
     <div className="max-w-4xl mx-auto">
       <button
-        onClick={() => navigate('/')}
+        onClick={() => navigate("/")}
         className="mb-4 text-blue-600 hover:underline flex items-center"
       >
         ← ホームに戻る
@@ -105,14 +106,19 @@ const ArticleDetail = () => {
           <h1 className="text-3xl font-bold text-gray-900 mb-4">
             {article.title}
           </h1>
-          
+
           <div className="flex items-center justify-between text-sm text-gray-600 mb-4">
             <div className="flex items-center space-x-4">
-              <span>投稿者: {article.author.username}</span>
+              <span>
+                投稿者:{" "}
+                <Link to={`/users/${article.author._id}`}>
+                  {article.author.username}
+                </Link>
+              </span>
               <span>{formatDate(article.createdAt)}</span>
               <span>👁 {article.views} 閲覧</span>
             </div>
-            
+
             {isAuthor && (
               <div className="flex space-x-2">
                 <button
@@ -145,7 +151,7 @@ const ArticleDetail = () => {
           )}
         </header>
 
-        <div 
+        <div
           className="article-content prose max-w-none mb-6"
           dangerouslySetInnerHTML={{ __html: article.content }}
         />
@@ -157,17 +163,17 @@ const ArticleDetail = () => {
                 <button
                   onClick={handleLike}
                   className={`flex items-center space-x-1 px-4 py-2 rounded ${
-                    isLiked 
-                      ? 'bg-red-100 text-red-600' 
-                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                    isLiked
+                      ? "bg-red-100 text-red-600"
+                      : "bg-gray-100 text-gray-600 hover:bg-gray-200"
                   }`}
                 >
-                  <span>{isLiked ? '❤️' : '🤍'}</span>
+                  <span>{isLiked ? "❤️" : "🤍"}</span>
                   <span>{article.likes?.length || 0}</span>
                 </button>
               )}
             </div>
-            
+
             <div className="text-sm text-gray-500">
               {article.updatedAt !== article.createdAt && (
                 <span>最終更新: {formatDate(article.updatedAt)}</span>

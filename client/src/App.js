@@ -11,6 +11,7 @@ import EditArticle from "./pages/EditArticle";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import Contact from "./pages/Contact";
 import Footer from "./components/Footer";
+import UserProfile from "./pages/UserProfile";
 
 function App() {
   return (
@@ -28,6 +29,7 @@ function App() {
               <Route path="/articles/:id/edit" element={<EditArticle />} />
               <Route path="/privacy-policy" element={<PrivacyPolicy />} />
               <Route path="/contact" element={<Contact />} />
+              <Route path="/users/:id" element={<UserProfile />} />
             </Routes>
           </main>
         </div>

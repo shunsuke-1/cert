@@ -56,12 +56,12 @@ const Navbar = () => {
               </>
             )}
             {/* プライバシーポリシーへのリンク */}
-            <Link
+            {/* <Link
               to="/privacy-policy"
               className="hover:text-blue-200 w-full sm:w-auto sm:ml-4 mt-2 sm:mt-0"
             >
               プライバシーポリシー
-            </Link>
+            </Link> */}
           </div>
         </div>
       </div>

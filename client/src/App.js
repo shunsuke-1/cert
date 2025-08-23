@@ -9,6 +9,8 @@ import Profile from "./pages/Profile";
 import ArticleDetail from "./pages/ArticleDetail";
 import EditArticle from "./pages/EditArticle";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
+import Contact from "./pages/Contact";
+import Footer from "./components/Footer";
 
 function App() {
   return (
@@ -25,9 +27,11 @@ function App() {
               <Route path="/articles/:id" element={<ArticleDetail />} />
               <Route path="/articles/:id/edit" element={<EditArticle />} />
               <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+              <Route path="/contact" element={<Contact />} />
             </Routes>
           </main>
         </div>
+        <Footer />
       </Router>
     </AuthProvider>
   );

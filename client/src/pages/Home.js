@@ -61,25 +61,34 @@ const Home = () => {
   return (
     <div>
       {/* Hero セクション */}
-      <section className="bg-gradient-to-br from-blue-50 to-white py-20">
-        <div className="max-w-4xl mx-auto px-4 text-center">
-          <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight text-gray-900 mb-6">
-            資格学習をもっと楽しく
+      <section className="relative py-32 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-purple-600/10 via-blue-600/10 to-indigo-600/10"></div>
+        <div className="absolute inset-0">
+          <div className="absolute top-10 left-10 w-72 h-72 bg-purple-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>
+          <div className="absolute top-10 right-10 w-72 h-72 bg-yellow-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>
+          <div className="absolute -bottom-8 left-20 w-72 h-72 bg-pink-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-4000"></div>
+        </div>
+        
+        <div className="relative max-w-6xl mx-auto px-4 text-center">
+          <h1 className="text-5xl sm:text-7xl font-display font-bold text-gray-900 mb-8 leading-tight">
+            資格学習を
+            <span className="text-gradient block">もっと楽しく</span>
           </h1>
-          <p className="text-lg sm:text-xl text-gray-600 mb-8">
-            資格試験に関する知識や経験を共有しよう！
+          <p className="text-xl sm:text-2xl text-gray-700 mb-12 max-w-3xl mx-auto leading-relaxed font-medium">
+            資格試験に関する知識や経験を共有し、<br className="hidden sm:block" />
+            一緒に成長していくコミュニティ
           </p>
           {!currentUser && (
-            <div className="flex flex-col sm:flex-row justify-center gap-4">
+            <div className="flex flex-col sm:flex-row justify-center gap-6">
               <Link
                 to="/register"
-                className="bg-gradient-to-r from-indigo-600 to-blue-600 text-white px-6 py-3 rounded-lg shadow-md hover:opacity-90 transition"
+                className="btn-primary text-lg px-8 py-4"
               >
                 コミュニティに参加
               </Link>
               <Link
                 to="/login"
-                className="border border-indigo-600 text-indigo-600 px-6 py-3 rounded-lg hover:bg-indigo-50 transition"
+                className="btn-secondary text-lg px-8 py-4"
               >
                 ログイン
               </Link>
@@ -89,15 +98,18 @@ const Home = () => {
       </section>
 
       {/* 記事セクション */}
-      <section className="max-w-4xl mx-auto px-4 py-12">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 space-y-2 sm:space-y-0 sm:space-x-4">
-          <h2 className="text-2xl font-bold text-gray-900">記事一覧</h2>
+      <section className="max-w-6xl mx-auto px-4 py-16">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-12 space-y-4 sm:space-y-0 sm:space-x-4">
+          <div>
+            <h2 className="text-4xl font-display font-bold text-gray-900 mb-2">記事一覧</h2>
+            <p className="text-gray-700 text-lg font-medium">最新の学習記事をチェックしよう</p>
+          </div>
           {currentUser && (
             <button
               onClick={() => setShowCreateForm(!showCreateForm)}
-              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 w-full sm:w-auto"
+              className={`${showCreateForm ? 'btn-secondary' : 'btn-primary'} text-lg px-6 py-3 w-full sm:w-auto`}
             >
-              {showCreateForm ? "キャンセル" : "記事を作成"}
+              {showCreateForm ? "キャンセル" : "✨ 記事を作成"}
             </button>
           )}
         </div>
@@ -127,28 +139,30 @@ const Home = () => {
                 ))}
                 {/* ページネーション */}
                 {totalPages > 1 && (
-                  <div className="flex justify-center mt-6 space-x-2">
-                    <button
-                      onClick={() =>
-                        setCurrentPage(Math.max(1, currentPage - 1))
-                      }
-                      disabled={currentPage === 1}
-                      className="px-4 py-2 border rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
-                    >
-                      前へ
-                    </button>
-                    <span className="px-4 py-2 text-gray-600">
-                      {currentPage} / {totalPages}
-                    </span>
-                    <button
-                      onClick={() =>
-                        setCurrentPage(Math.min(totalPages, currentPage + 1))
-                      }
-                      disabled={currentPage === totalPages}
-                      className="px-4 py-2 border rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
-                    >
-                      次へ
-                    </button>
+                  <div className="flex justify-center mt-12">
+                    <div className="card-modern p-4 flex items-center space-x-4">
+                      <button
+                        onClick={() =>
+                          setCurrentPage(Math.max(1, currentPage - 1))
+                        }
+                        disabled={currentPage === 1}
+                        className="px-6 py-2 rounded-lg border-2 border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed hover:border-purple-400 hover:bg-purple-50 transition-all duration-200 font-medium text-gray-700"
+                      >
+                        ← 前へ
+                      </button>
+                      <span className="px-4 py-2 text-gray-700 font-semibold">
+                        {currentPage} / {totalPages}
+                      </span>
+                      <button
+                        onClick={() =>
+                          setCurrentPage(Math.min(totalPages, currentPage + 1))
+                        }
+                        disabled={currentPage === totalPages}
+                        className="px-6 py-2 rounded-lg border-2 border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed hover:border-purple-400 hover:bg-purple-50 transition-all duration-200 font-medium text-gray-700"
+                      >
+                        次へ →
+                      </button>
+                    </div>
                   </div>
                 )}
               </>

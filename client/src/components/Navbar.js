@@ -12,38 +12,45 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="bg-blue-600 text-white shadow-lg">
+    <nav className="glass-dark text-white shadow-xl sticky top-0 z-50 border-b border-white/10">
       <div className="container mx-auto px-4">
-        <div className="flex justify-between items-center py-4">
-          {/* タイトルをモダンに装飾：大きな太字＋グラデーション */}
+        <div className="flex justify-between items-center py-6">
           <Link
             to="/"
-            className="text-2xl sm:text-3xl font-bold text-white hover:text-blue-200 font-script"
+            className="text-3xl sm:text-4xl font-display font-bold text-gradient-accent hover:scale-105 transition-transform duration-300"
           >
             Shikaku
           </Link>
 
-          {/* 以下はログイン・ユーザー表示部分（元のまま） */}
           {currentUser ? (
-            <div className="flex items-center space-x-4">
-              <Link to="/profile" className="hover:text-blue-200">
-                {currentUser.username}
+            <div className="flex items-center space-x-6">
+              <Link 
+                to="/profile" 
+                className="text-white/95 hover:text-white font-medium transition-colors duration-200 flex items-center space-x-2"
+              >
+                <div className="w-8 h-8 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full flex items-center justify-center text-sm font-bold">
+                  {currentUser.username.charAt(0).toUpperCase()}
+                </div>
+                <span className="hidden sm:block">{currentUser.username}</span>
               </Link>
               <button
                 onClick={handleLogout}
-                className="bg-blue-700 px-3 py-1 rounded hover:bg-blue-800"
+                className="btn-secondary text-sm"
               >
                 ログアウト
               </button>
             </div>
           ) : (
-            <div className="flex items-center space-x-3">
-              <Link to="/login" className="hover:text-blue-200">
+            <div className="flex items-center space-x-4">
+              <Link 
+                to="/login" 
+                className="text-white/95 hover:text-white font-medium transition-colors duration-200"
+              >
                 ログイン
               </Link>
               <Link
                 to="/register"
-                className="bg-blue-700 px-3 py-1 rounded hover:bg-blue-800"
+                className="btn-primary text-sm"
               >
                 新規登録
               </Link>

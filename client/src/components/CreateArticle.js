@@ -55,16 +55,16 @@ const CreateArticle = ({ onArticleCreated, onCancel }) => {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-      <h2 className="text-xl font-semibold mb-4">新しい記事を作成</h2>
+    <div className="card-modern p-8 mb-8">
+      <h2 className="text-3xl font-display font-bold text-gray-900 mb-6">新しい記事を作成</h2>
       {error && (
         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
           {error}
         </div>
       )}
       <form onSubmit={handleSubmit}>
-        <div className="mb-4">
-          <label className="block text-gray-700 text-sm font-bold mb-2">
+        <div className="mb-6">
+          <label className="block text-gray-800 text-lg font-semibold mb-3">
             タイトル
           </label>
           <input
@@ -73,14 +73,14 @@ const CreateArticle = ({ onArticleCreated, onCancel }) => {
             onChange={(e) =>
               setFormData({ ...formData, title: e.target.value })
             }
-            className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500"
+            className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all duration-200 text-lg"
             placeholder="記事のタイトルを入力してください"
             maxLength={200}
             required
           />
         </div>
-        <div className="mb-4">
-          <label className="block text-gray-700 text-sm font-bold mb-2">
+        <div className="mb-6">
+          <label className="block text-gray-800 text-lg font-semibold mb-3">
             内容
           </label>
           <RichTextEditor
@@ -88,8 +88,8 @@ const CreateArticle = ({ onArticleCreated, onCancel }) => {
             onChange={(content) => setFormData({ ...formData, content })}
           />
         </div>
-        <div className="mb-6">
-          <label className="block text-gray-700 text-sm font-bold mb-2">
+        <div className="mb-8">
+          <label className="block text-gray-800 text-lg font-semibold mb-3">
             タグ
           </label>
           <input
@@ -97,21 +97,21 @@ const CreateArticle = ({ onArticleCreated, onCancel }) => {
             value={tagInput}
             onChange={(e) => setTagInput(e.target.value)}
             onKeyPress={handleAddTag}
-            className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500"
+            className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all duration-200"
             placeholder="タグを入力してEnterキーを押してください"
           />
           {formData.tags.length > 0 && (
-            <div className="flex flex-wrap gap-2 mt-2">
+            <div className="flex flex-wrap gap-3 mt-4">
               {formData.tags.map((tag, index) => (
                 <span
                   key={index}
-                  className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-sm flex items-center"
+                  className="tag-modern flex items-center"
                 >
-                  {tag}
+                  #{tag}
                   <button
                     type="button"
                     onClick={() => removeTag(tag)}
-                    className="ml-1 text-blue-600 hover:text-blue-800"
+                    className="ml-2 text-purple-600 hover:text-purple-800 font-bold"
                   >
                     ×
                   </button>
@@ -120,18 +120,18 @@ const CreateArticle = ({ onArticleCreated, onCancel }) => {
             </div>
           )}
         </div>
-        <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
+        <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-6">
           <button
             type="submit"
-            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 w-full sm:w-auto"
+            className="btn-primary text-lg px-8 py-3 w-full sm:w-auto"
             disabled={loading}
           >
-            {loading ? "投稿中..." : "記事を投稿"}
+            {loading ? "投稿中..." : "✨ 記事を投稿"}
           </button>
           <button
             type="button"
             onClick={onCancel}
-            className="bg-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-400 w-full sm:w-auto"
+            className="btn-secondary text-lg px-8 py-3 w-full sm:w-auto"
           >
             キャンセル
           </button>

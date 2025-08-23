@@ -8,19 +8,25 @@ const Profile = () => {
   const { currentUser } = useAuth();
   const navigate = useNavigate();
 
+  // 編集モード、プロフィール内容の状態
   const [isEditing, setIsEditing] = useState(false);
   const [profile, setProfile] = useState({
     bio: currentUser?.profile?.bio || "",
     studyGoals: currentUser?.profile?.studyGoals || [],
     certifications: currentUser?.profile?.certifications || [],
   });
+
+  // 投稿一覧・読み込み状態
   const [articles, setArticles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+
+  // コミュニティ統計
   const [stats, setStats] = useState({ articleCount: 0, totalLikes: 0 });
-  // 追加: フォロワー数・フォロー数のステート
+
+  // フォロー数／フォロワー数
   const [followersCount, setFollowersCount] = useState(0);
   const [followingCount, setFollowingCount] = useState(0);
 
@@ -34,15 +40,15 @@ const Profile = () => {
     fetchFollowCounts();
   }, [currentUser, navigate, currentPage]);
 
-  // 自分の投稿記事を取得
+  // 自分の投稿記事を取得（ページネーション付き）
   const fetchMyArticles = async () => {
     try {
       setLoading(true);
-      const response = await api.get("/api/articles/my-articles", {
+      const res = await api.get("/api/articles/my-articles", {
         params: { page: currentPage, limit: 10 },
       });
-      setArticles(response.data.articles);
-      setTotalPages(response.data.totalPages);
+      setArticles(res.data.articles);
+      setTotalPages(res.data.totalPages);
     } catch (error) {
       console.error("Error fetching my articles:", error);
     } finally {
@@ -50,30 +56,30 @@ const Profile = () => {
     }
   };
 
-  // いいね数・投稿数などの統計情報を取得
+  // いいね数・投稿数などの統計を取得
   const fetchUserStats = async () => {
     try {
       const userId = currentUser.id || currentUser._id;
-      const response = await api.get(`/api/users/stats/${userId}`);
-      setStats(response.data);
+      const res = await api.get(`/api/users/stats/${userId}`);
+      setStats(res.data);
     } catch (error) {
       console.error("Error fetching user stats:", error);
     }
   };
 
-  // フォロー中・フォロワー数を取得
+  // フォロー数とフォロワー数を取得
   const fetchFollowCounts = async () => {
     try {
       const userId = currentUser.id || currentUser._id;
-      const response = await api.get(`/api/users/${userId}`);
-      setFollowersCount(response.data.followers?.length || 0);
-      setFollowingCount(response.data.following?.length || 0);
+      const res = await api.get(`/api/users/${userId}`);
+      setFollowersCount(res.data.followers?.length || 0);
+      setFollowingCount(res.data.following?.length || 0);
     } catch (error) {
       console.error("Error fetching follow counts:", error);
     }
   };
 
-  // 記事作成後のハンドラ
+  // 新規記事投稿後の処理
   const handleArticleCreated = (newArticle) => {
     setArticles([newArticle, ...articles]);
     setShowCreateForm(false);
@@ -81,7 +87,7 @@ const Profile = () => {
     fetchFollowCounts();
   };
 
-  // 記事削除
+  // 記事削除処理
   const handleDeleteArticle = async (articleId) => {
     if (!window.confirm("この記事を削除しますか？")) return;
     try {
@@ -94,7 +100,7 @@ const Profile = () => {
     }
   };
 
-  // プロフィール保存
+  // プロフィール更新処理
   const handleSave = async () => {
     try {
       await api.put("/api/users/profile", { profile });
@@ -105,7 +111,7 @@ const Profile = () => {
     }
   };
 
-  // 日付フォーマット
+  // 日付表示用フォーマッタ
   const formatDate = (date) => {
     return new Date(date).toLocaleDateString("ja-JP", {
       year: "numeric",
@@ -114,7 +120,7 @@ const Profile = () => {
     });
   };
 
-  // 未ログイン状態の処理
+  // ログインしていない場合の表示
   if (!currentUser) {
     return (
       <div className="text-center">
@@ -125,7 +131,7 @@ const Profile = () => {
 
   return (
     <div className="max-w-4xl mx-auto">
-      {/* プロフィールセクション */}
+      {/* ----- プロフィールセクション ----- */}
       <div className="bg-white rounded-lg shadow-md p-8 mb-8">
         <div className="flex justify-between items-start mb-8">
           <div>
@@ -136,7 +142,11 @@ const Profile = () => {
               {new Date(currentUser.createdAt).toLocaleDateString("ja-JP")}
             </p>
             <p className="mt-2">
-              フォロー中: {followingCount}人 / フォロワー: {followersCount}人
+              {/* フォロー数をリンク化して FollowingList ページへ遷移 */}
+              <Link to="/following" className="text-blue-600 hover:underline">
+                フォロー中: {followingCount}人
+              </Link>{" "}
+              / フォロワー: {followersCount}人
             </p>
           </div>
           <button
@@ -147,8 +157,9 @@ const Profile = () => {
           </button>
         </div>
 
-        {/* 自己紹介と資格 */}
+        {/* 自己紹介 & 資格編集/表示 */}
         <div className="grid md:grid-cols-2 gap-8">
+          {/* 自己紹介 */}
           <div>
             <h2 className="text-xl font-semibold mb-4">自己紹介</h2>
             {isEditing ? (
@@ -167,6 +178,8 @@ const Profile = () => {
               </p>
             )}
           </div>
+
+          {/* 資格 */}
           <div>
             <h2 className="text-xl font-semibold mb-4">資格</h2>
             {isEditing ? (
@@ -232,29 +245,31 @@ const Profile = () => {
               </div>
             ) : (
               <div className="space-y-2">
-                {profile.certifications.map((cert, index) => (
-                  <div
-                    key={index}
-                    className="flex justify-between items-center p-3 bg-gray-50 rounded"
-                  >
-                    <span className="font-medium">{cert.name}</span>
-                    <span
-                      className={`px-2 py-1 rounded text-sm ${
-                        cert.status === "passed"
-                          ? "bg-green-100 text-green-800"
-                          : cert.status === "studying"
-                          ? "bg-blue-100 text-blue-800"
-                          : "bg-yellow-100 text-yellow-800"
-                      }`}
+                {profile.certifications.length > 0 ? (
+                  profile.certifications.map((cert, index) => (
+                    <div
+                      key={index}
+                      className="flex justify-between items-center p-3 bg-gray-50 rounded"
                     >
-                      {cert.status === "passed"
-                        ? "合格"
-                        : cert.status === "studying"
-                        ? "学習中"
-                        : "計画中"}
-                    </span>
-                  </div>
-                )) || (
+                      <span className="font-medium">{cert.name}</span>
+                      <span
+                        className={`px-2 py-1 rounded text-sm ${
+                          cert.status === "passed"
+                            ? "bg-green-100 text-green-800"
+                            : cert.status === "studying"
+                            ? "bg-blue-100 text-blue-800"
+                            : "bg-yellow-100 text-yellow-800"
+                        }`}
+                      >
+                        {cert.status === "passed"
+                          ? "合格"
+                          : cert.status === "studying"
+                          ? "学習中"
+                          : "計画中"}
+                      </span>
+                    </div>
+                  ))
+                ) : (
                   <p className="text-gray-500">
                     まだ資格が追加されていません。
                   </p>
@@ -268,37 +283,34 @@ const Profile = () => {
         <div className="mt-8">
           <h2 className="text-xl font-semibold mb-4">学習目標</h2>
           {isEditing ? (
-            <div>
-              <textarea
-                value={profile.studyGoals.join("\n")}
-                onChange={(e) =>
-                  setProfile({
-                    ...profile,
-                    studyGoals: e.target.value
-                      .split("\n")
-                      .filter((goal) => goal.trim()),
-                  })
-                }
-                placeholder="学習目標を入力してください（1行に1つ）"
-                className="w-full px-3 py-2 border rounded focus:outline-none focus:border-blue-500"
-                rows="3"
-              />
-            </div>
-          ) : (
+            <textarea
+              value={profile.studyGoals.join("\n")}
+              onChange={(e) =>
+                setProfile({
+                  ...profile,
+                  studyGoals: e.target.value
+                    .split("\n")
+                    .filter((goal) => goal.trim()),
+                })
+              }
+              placeholder="学習目標を入力してください（1行に1つ）"
+              className="w-full px-3 py-2 border rounded focus:outline-none focus:border-blue-500"
+              rows="3"
+            />
+          ) : profile.studyGoals.length > 0 ? (
             <ul className="list-disc list-inside space-y-1">
               {profile.studyGoals.map((goal, index) => (
                 <li key={index} className="text-gray-700">
                   {goal}
                 </li>
-              )) || (
-                <p className="text-gray-500">
-                  まだ学習目標が設定されていません。
-                </p>
-              )}
+              ))}
             </ul>
+          ) : (
+            <p className="text-gray-500">まだ学習目標が設定されていません。</p>
           )}
         </div>
 
+        {/* 編集時の保存ボタン */}
         {isEditing && (
           <div className="mt-8 flex space-x-4">
             <button
@@ -310,7 +322,7 @@ const Profile = () => {
           </div>
         )}
 
-        {/* コミュニティ統計 */}
+        {/* コミュニティ統計表示 */}
         <div className="mt-8 pt-8 border-t">
           <h2 className="text-xl font-semibold mb-4">コミュニティ統計</h2>
           <div className="grid md:grid-cols-2 gap-4">
@@ -330,7 +342,7 @@ const Profile = () => {
         </div>
       </div>
 
-      {/* 記事管理セクション */}
+      {/* ----- 記事管理セクション ----- */}
       <div>
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-bold">
@@ -343,6 +355,8 @@ const Profile = () => {
             {showCreateForm ? "キャンセル" : "新しい記事を作成"}
           </button>
         </div>
+
+        {/* 記事作成フォーム */}
         {showCreateForm && (
           <div className="mb-8">
             <CreateArticle
@@ -351,6 +365,8 @@ const Profile = () => {
             />
           </div>
         )}
+
+        {/* 記事リストまたはローディング/なしの表示 */}
         {loading ? (
           <div className="text-center py-8">
             <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
@@ -419,6 +435,7 @@ const Profile = () => {
                 </div>
               ))}
             </div>
+
             {/* ページネーション */}
             {totalPages > 1 && (
               <div className="flex justify-center mt-8 space-x-2">

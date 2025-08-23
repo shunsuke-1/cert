@@ -12,6 +12,7 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import Contact from "./pages/Contact";
 import Footer from "./components/Footer";
 import UserProfile from "./pages/UserProfile";
+import FollowingList from "./pages/FollowingList";
 
 function App() {
   return (
@@ -30,6 +31,7 @@ function App() {
               <Route path="/privacy-policy" element={<PrivacyPolicy />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="/users/:id" element={<UserProfile />} />
+              <Route path="/following" element={<FollowingList />} />
             </Routes>
           </main>
         </div>

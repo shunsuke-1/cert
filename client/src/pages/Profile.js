@@ -8,7 +8,7 @@ const Profile = () => {
   const { currentUser } = useAuth();
   const navigate = useNavigate();
 
-  // 編集モード、プロフィール内容の状態
+  // 編集モードやプロフィール内容
   const [isEditing, setIsEditing] = useState(false);
   const [profile, setProfile] = useState({
     bio: currentUser?.profile?.bio || "",
@@ -16,17 +16,15 @@ const Profile = () => {
     certifications: currentUser?.profile?.certifications || [],
   });
 
-  // 投稿一覧・読み込み状態
+  // 投稿一覧・ページング
   const [articles, setArticles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
-  // コミュニティ統計
+  // 統計 & フォロー数
   const [stats, setStats] = useState({ articleCount: 0, totalLikes: 0 });
-
-  // フォロー数／フォロワー数
   const [followersCount, setFollowersCount] = useState(0);
   const [followingCount, setFollowingCount] = useState(0);
 
@@ -40,7 +38,7 @@ const Profile = () => {
     fetchFollowCounts();
   }, [currentUser, navigate, currentPage]);
 
-  // 自分の投稿記事を取得（ページネーション付き）
+  // 自分の投稿を取得
   const fetchMyArticles = async () => {
     try {
       setLoading(true);
@@ -56,7 +54,7 @@ const Profile = () => {
     }
   };
 
-  // いいね数・投稿数などの統計を取得
+  // 統計取得
   const fetchUserStats = async () => {
     try {
       const userId = currentUser.id || currentUser._id;
@@ -67,7 +65,7 @@ const Profile = () => {
     }
   };
 
-  // フォロー数とフォロワー数を取得
+  // フォロー数取得
   const fetchFollowCounts = async () => {
     try {
       const userId = currentUser.id || currentUser._id;
@@ -79,7 +77,7 @@ const Profile = () => {
     }
   };
 
-  // 新規記事投稿後の処理
+  // 記事投稿後の処理
   const handleArticleCreated = (newArticle) => {
     setArticles([newArticle, ...articles]);
     setShowCreateForm(false);
@@ -87,7 +85,7 @@ const Profile = () => {
     fetchFollowCounts();
   };
 
-  // 記事削除処理
+  // 記事削除
   const handleDeleteArticle = async (articleId) => {
     if (!window.confirm("この記事を削除しますか？")) return;
     try {
@@ -100,7 +98,7 @@ const Profile = () => {
     }
   };
 
-  // プロフィール更新処理
+  // プロフィール保存
   const handleSave = async () => {
     try {
       await api.put("/api/users/profile", { profile });
@@ -111,7 +109,7 @@ const Profile = () => {
     }
   };
 
-  // 日付表示用フォーマッタ
+  // 日付フォーマット
   const formatDate = (date) => {
     return new Date(date).toLocaleDateString("ja-JP", {
       year: "numeric",
@@ -120,7 +118,7 @@ const Profile = () => {
     });
   };
 
-  // ログインしていない場合の表示
+  // 未ログイン時の表示
   if (!currentUser) {
     return (
       <div className="text-center">
@@ -131,7 +129,7 @@ const Profile = () => {
 
   return (
     <div className="max-w-4xl mx-auto">
-      {/* ----- プロフィールセクション ----- */}
+      {/* プロフィールセクション */}
       <div className="bg-white rounded-lg shadow-md p-8 mb-8">
         <div className="flex justify-between items-start mb-8">
           <div>
@@ -142,7 +140,6 @@ const Profile = () => {
               {new Date(currentUser.createdAt).toLocaleDateString("ja-JP")}
             </p>
             <p className="mt-2">
-              {/* フォロー数をリンク化して FollowingList ページへ遷移 */}
               <Link to="/following" className="text-blue-600 hover:underline">
                 フォロー中: {followingCount}人
               </Link>{" "}
@@ -157,7 +154,7 @@ const Profile = () => {
           </button>
         </div>
 
-        {/* 自己紹介 & 資格編集/表示 */}
+        {/* 自己紹介と資格の編集 */}
         <div className="grid md:grid-cols-2 gap-8">
           {/* 自己紹介 */}
           <div>
@@ -178,7 +175,6 @@ const Profile = () => {
               </p>
             )}
           </div>
-
           {/* 資格 */}
           <div>
             <h2 className="text-xl font-semibold mb-4">資格</h2>
@@ -195,7 +191,10 @@ const Profile = () => {
                       onChange={(e) => {
                         const newCerts = [...profile.certifications];
                         newCerts[index].name = e.target.value;
-                        setProfile({ ...profile, certifications: newCerts });
+                        setProfile({
+                          ...profile,
+                          certifications: newCerts,
+                        });
                       }}
                       placeholder="資格名"
                       className="flex-1 px-2 py-1 border rounded focus:outline-none focus:border-blue-500"
@@ -205,7 +204,10 @@ const Profile = () => {
                       onChange={(e) => {
                         const newCerts = [...profile.certifications];
                         newCerts[index].status = e.target.value;
-                        setProfile({ ...profile, certifications: newCerts });
+                        setProfile({
+                          ...profile,
+                          certifications: newCerts,
+                        });
                       }}
                       className="px-2 py-1 border rounded focus:outline-none focus:border-blue-500"
                     >
@@ -219,7 +221,10 @@ const Profile = () => {
                         const newCerts = profile.certifications.filter(
                           (_, i) => i !== index
                         );
-                        setProfile({ ...profile, certifications: newCerts });
+                        setProfile({
+                          ...profile,
+                          certifications: newCerts,
+                        });
                       }}
                       className="text-red-600 hover:text-red-800"
                     >
@@ -310,7 +315,6 @@ const Profile = () => {
           )}
         </div>
 
-        {/* 編集時の保存ボタン */}
         {isEditing && (
           <div className="mt-8 flex space-x-4">
             <button
@@ -322,7 +326,7 @@ const Profile = () => {
           </div>
         )}
 
-        {/* コミュニティ統計表示 */}
+        {/* コミュニティ統計 */}
         <div className="mt-8 pt-8 border-t">
           <h2 className="text-xl font-semibold mb-4">コミュニティ統計</h2>
           <div className="grid md:grid-cols-2 gap-4">
@@ -342,7 +346,7 @@ const Profile = () => {
         </div>
       </div>
 
-      {/* ----- 記事管理セクション ----- */}
+      {/* 記事管理セクション */}
       <div>
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-bold">
@@ -356,18 +360,15 @@ const Profile = () => {
           </button>
         </div>
 
-        {/* 記事作成フォーム */}
-        {showCreateForm && (
+        {/* 作成フォーム表示中は一覧を隠す */}
+        {showCreateForm ? (
           <div className="mb-8">
             <CreateArticle
               onArticleCreated={handleArticleCreated}
               onCancel={() => setShowCreateForm(false)}
             />
           </div>
-        )}
-
-        {/* 記事リストまたはローディング/なしの表示 */}
-        {loading ? (
+        ) : loading ? (
           <div className="text-center py-8">
             <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
             <p className="mt-2 text-gray-600">記事を読み込み中...</p>

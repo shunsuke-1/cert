@@ -7,6 +7,7 @@ import CreateArticle from "../components/CreateArticle";
 const Profile = () => {
   const { currentUser } = useAuth();
   const navigate = useNavigate();
+
   const [isEditing, setIsEditing] = useState(false);
   const [profile, setProfile] = useState({
     bio: currentUser?.profile?.bio || "",
@@ -19,6 +20,9 @@ const Profile = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [stats, setStats] = useState({ articleCount: 0, totalLikes: 0 });
+  // 追加: フォロワー数・フォロー数のステート
+  const [followersCount, setFollowersCount] = useState(0);
+  const [followingCount, setFollowingCount] = useState(0);
 
   useEffect(() => {
     if (!currentUser) {
@@ -27,8 +31,10 @@ const Profile = () => {
     }
     fetchMyArticles();
     fetchUserStats();
+    fetchFollowCounts();
   }, [currentUser, navigate, currentPage]);
 
+  // 自分の投稿記事を取得
   const fetchMyArticles = async () => {
     try {
       setLoading(true);
@@ -44,6 +50,7 @@ const Profile = () => {
     }
   };
 
+  // いいね数・投稿数などの統計情報を取得
   const fetchUserStats = async () => {
     try {
       const userId = currentUser.id || currentUser._id;
@@ -54,12 +61,27 @@ const Profile = () => {
     }
   };
 
+  // フォロー中・フォロワー数を取得
+  const fetchFollowCounts = async () => {
+    try {
+      const userId = currentUser.id || currentUser._id;
+      const response = await api.get(`/api/users/${userId}`);
+      setFollowersCount(response.data.followers?.length || 0);
+      setFollowingCount(response.data.following?.length || 0);
+    } catch (error) {
+      console.error("Error fetching follow counts:", error);
+    }
+  };
+
+  // 記事作成後のハンドラ
   const handleArticleCreated = (newArticle) => {
     setArticles([newArticle, ...articles]);
     setShowCreateForm(false);
     fetchUserStats();
+    fetchFollowCounts();
   };
 
+  // 記事削除
   const handleDeleteArticle = async (articleId) => {
     if (!window.confirm("この記事を削除しますか？")) return;
     try {
@@ -72,6 +94,7 @@ const Profile = () => {
     }
   };
 
+  // プロフィール保存
   const handleSave = async () => {
     try {
       await api.put("/api/users/profile", { profile });
@@ -82,6 +105,7 @@ const Profile = () => {
     }
   };
 
+  // 日付フォーマット
   const formatDate = (date) => {
     return new Date(date).toLocaleDateString("ja-JP", {
       year: "numeric",
@@ -90,6 +114,7 @@ const Profile = () => {
     });
   };
 
+  // 未ログイン状態の処理
   if (!currentUser) {
     return (
       <div className="text-center">
@@ -100,7 +125,7 @@ const Profile = () => {
 
   return (
     <div className="max-w-4xl mx-auto">
-      {/* Profile Section */}
+      {/* プロフィールセクション */}
       <div className="bg-white rounded-lg shadow-md p-8 mb-8">
         <div className="flex justify-between items-start mb-8">
           <div>
@@ -109,6 +134,9 @@ const Profile = () => {
             <p className="text-sm text-gray-500 mt-2">
               登録日:{" "}
               {new Date(currentUser.createdAt).toLocaleDateString("ja-JP")}
+            </p>
+            <p className="mt-2">
+              フォロー中: {followingCount}人 / フォロワー: {followersCount}人
             </p>
           </div>
           <button
@@ -119,6 +147,7 @@ const Profile = () => {
           </button>
         </div>
 
+        {/* 自己紹介と資格 */}
         <div className="grid md:grid-cols-2 gap-8">
           <div>
             <h2 className="text-xl font-semibold mb-4">自己紹介</h2>
@@ -138,7 +167,6 @@ const Profile = () => {
               </p>
             )}
           </div>
-
           <div>
             <h2 className="text-xl font-semibold mb-4">資格</h2>
             {isEditing ? (
@@ -236,6 +264,7 @@ const Profile = () => {
           </div>
         </div>
 
+        {/* 学習目標 */}
         <div className="mt-8">
           <h2 className="text-xl font-semibold mb-4">学習目標</h2>
           {isEditing ? (
@@ -281,7 +310,7 @@ const Profile = () => {
           </div>
         )}
 
-        {/* Community Statistics */}
+        {/* コミュニティ統計 */}
         <div className="mt-8 pt-8 border-t">
           <h2 className="text-xl font-semibold mb-4">コミュニティ統計</h2>
           <div className="grid md:grid-cols-2 gap-4">
@@ -301,7 +330,7 @@ const Profile = () => {
         </div>
       </div>
 
-      {/* Articles Management Section */}
+      {/* 記事管理セクション */}
       <div>
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-bold">
@@ -314,7 +343,6 @@ const Profile = () => {
             {showCreateForm ? "キャンセル" : "新しい記事を作成"}
           </button>
         </div>
-
         {showCreateForm && (
           <div className="mb-8">
             <CreateArticle
@@ -323,7 +351,6 @@ const Profile = () => {
             />
           </div>
         )}
-
         {loading ? (
           <div className="text-center py-8">
             <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
@@ -347,7 +374,6 @@ const Profile = () => {
                       <p className="text-gray-600 mb-3 line-clamp-2">
                         {article.excerpt}
                       </p>
-
                       {article.tags && article.tags.length > 0 && (
                         <div className="flex flex-wrap gap-2 mb-3">
                           {article.tags.map((tag, index) => (
@@ -360,7 +386,6 @@ const Profile = () => {
                           ))}
                         </div>
                       )}
-
                       <div className="flex items-center space-x-4 text-sm text-gray-500">
                         <span>投稿日: {formatDate(article.createdAt)}</span>
                         <span> {article.views || 0} 閲覧</span>
@@ -370,7 +395,6 @@ const Profile = () => {
                         )}
                       </div>
                     </div>
-
                     <div className="flex flex-col space-y-2 ml-4">
                       <Link
                         to={`/articles/${article._id}`}
@@ -395,8 +419,7 @@ const Profile = () => {
                 </div>
               ))}
             </div>
-
-            {/* Pagination */}
+            {/* ページネーション */}
             {totalPages > 1 && (
               <div className="flex justify-center mt-8 space-x-2">
                 <button

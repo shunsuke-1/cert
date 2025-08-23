@@ -70,6 +70,32 @@ router.get("/", async (req, res) => {
   }
 });
 
+// 既存の `/api/articles` ルート群に追加
+router.get("/user/:id", async (req, res) => {
+  try {
+    const { page = 1, limit = 10 } = req.query;
+    const userId = req.params.id;
+    const query = { author: userId };
+
+    const articles = await Article.find(query)
+      .populate("author", "username")
+      .sort({ createdAt: -1 })
+      .limit(limit * 1)
+      .skip((page - 1) * limit);
+
+    const total = await Article.countDocuments(query);
+
+    res.json({
+      articles,
+      totalPages: Math.ceil(total / limit),
+      currentPage: page,
+    });
+  } catch (error) {
+    console.error("Error fetching articles by user:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
 // Get single article by ID
 router.get("/:id", async (req, res) => {
   try {
@@ -181,32 +207,6 @@ router.delete("/:id", auth, async (req, res) => {
     res.json({ message: "Article deleted successfully" });
   } catch (error) {
     console.error("Error deleting article:", error);
-    res.status(500).json({ message: "Server error" });
-  }
-});
-
-// 既存の `/api/articles` ルート群に追加
-router.get("/user/:id", async (req, res) => {
-  try {
-    const { page = 1, limit = 10 } = req.query;
-    const userId = req.params.id;
-    const query = { author: userId };
-
-    const articles = await Article.find(query)
-      .populate("author", "username")
-      .sort({ createdAt: -1 })
-      .limit(limit * 1)
-      .skip((page - 1) * limit);
-
-    const total = await Article.countDocuments(query);
-
-    res.json({
-      articles,
-      totalPages: Math.ceil(total / limit),
-      currentPage: page,
-    });
-  } catch (error) {
-    console.error("Error fetching articles by user:", error);
     res.status(500).json({ message: "Server error" });
   }
 });

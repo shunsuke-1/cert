@@ -17,7 +17,6 @@ const Home = () => {
   const [sortBy, setSortBy] = useState("newest");
   const [filterTag, setFilterTag] = useState("");
   const [popularTags, setPopularTags] = useState([]);
-  const [featuredArticles, setFeaturedArticles] = useState([]);
   const [communityStats, setCommunityStats] = useState({
     totalArticles: 0,
     totalUsers: 0,
@@ -26,23 +25,48 @@ const Home = () => {
 
   useEffect(() => {
     fetchArticles();
-    fetchPopularTags();
-    fetchFeaturedArticles();
-    fetchCommunityStats();
+    fetchAllArticlesForStats();
   }, [currentPage, searchTerm, sortBy, filterTag]);
+
+  useEffect(() => {
+    if (articles.length > 0) {
+      extractPopularTags();
+    }
+  }, [articles]);
 
   const fetchArticles = async () => {
     try {
       setLoading(true);
-      const params = { 
-        page: currentPage, 
-        limit: 10,
-        sortBy,
-        ...(searchTerm && { search: searchTerm }),
-        ...(filterTag && { tag: filterTag })
-      };
+      const params = { page: currentPage, limit: 10 };
+      if (searchTerm) {
+        params.search = searchTerm;
+      }
       const response = await api.get("/api/articles", { params });
-      setArticles(response.data.articles);
+      let fetchedArticles = response.data.articles;
+      
+      // Client-side filtering and sorting since backend doesn't support it yet
+      if (filterTag) {
+        fetchedArticles = fetchedArticles.filter(article => 
+          article.tags && article.tags.includes(filterTag)
+        );
+      }
+      
+      // Client-side sorting
+      switch (sortBy) {
+        case 'popular':
+          fetchedArticles.sort((a, b) => (b.views || 0) - (a.views || 0));
+          break;
+        case 'mostLiked':
+          fetchedArticles.sort((a, b) => (b.likes?.length || 0) - (a.likes?.length || 0));
+          break;
+        case 'mostViewed':
+          fetchedArticles.sort((a, b) => (b.views || 0) - (a.views || 0));
+          break;
+        default: // newest
+          fetchedArticles.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+      }
+      
+      setArticles(fetchedArticles);
       setTotalPages(response.data.totalPages);
     } catch (error) {
       console.error("Error fetching articles:", error);
@@ -51,30 +75,41 @@ const Home = () => {
     }
   };
 
-  const fetchPopularTags = async () => {
-    try {
-      const response = await api.get("/api/articles/popular-tags");
-      setPopularTags(response.data.slice(0, 10));
-    } catch (error) {
-      console.error("Error fetching popular tags:", error);
-    }
+  const extractPopularTags = () => {
+    // Extract tags from current articles and count them
+    const tagCounts = {};
+    articles.forEach(article => {
+      if (article.tags) {
+        article.tags.forEach(tag => {
+          tagCounts[tag] = (tagCounts[tag] || 0) + 1;
+        });
+      }
+    });
+    
+    const sortedTags = Object.entries(tagCounts)
+      .map(([tag, count]) => ({ _id: tag, count }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 10);
+    
+    setPopularTags(sortedTags);
   };
 
-  const fetchFeaturedArticles = async () => {
+  const fetchAllArticlesForStats = async () => {
     try {
-      const response = await api.get("/api/articles/featured");
-      setFeaturedArticles(response.data.slice(0, 3));
+      // Fetch all articles for accurate community stats
+      const response = await api.get("/api/articles", { params: { limit: 1000 } });
+      const allArticles = response.data.articles;
+      
+      const totalLikes = allArticles.reduce((sum, article) => sum + (article.likes?.length || 0), 0);
+      const uniqueAuthors = new Set(allArticles.map(article => article.author?._id)).size;
+      
+      setCommunityStats({
+        totalArticles: allArticles.length,
+        totalUsers: uniqueAuthors,
+        totalLikes: totalLikes
+      });
     } catch (error) {
-      console.error("Error fetching featured articles:", error);
-    }
-  };
-
-  const fetchCommunityStats = async () => {
-    try {
-      const response = await api.get("/api/stats/community");
-      setCommunityStats(response.data);
-    } catch (error) {
-      console.error("Error fetching community stats:", error);
+      console.error("Error fetching articles for stats:", error);
     }
   };
 
@@ -199,14 +234,18 @@ const Home = () => {
           </div>
         )}
 
-        {/* Featured Articles */}
-        {featuredArticles.length > 0 && !searchTerm && !filterTag && (
+        {/* Featured Articles - Show top 3 most liked articles */}
+        {articles.length > 0 && !searchTerm && !filterTag && (
           <div className="mb-8 sm:mb-12">
             <h3 className="text-2xl sm:text-3xl font-display font-bold text-gray-900 mb-6 text-center">
               ✨ 注目の記事
             </h3>
             <div className="grid md:grid-cols-3 gap-6">
-              {featuredArticles.map((article) => (
+              {articles
+                .slice()
+                .sort((a, b) => (b.likes?.length || 0) - (a.likes?.length || 0))
+                .slice(0, 3)
+                .map((article) => (
                 <div key={article._id} className="card-modern p-6 group hover:scale-105 transition-transform duration-300">
                   <Link to={`/articles/${article._id}`}>
                     <h4 className="font-display font-semibold text-lg text-gray-900 group-hover:text-purple-600 mb-3 line-clamp-2">

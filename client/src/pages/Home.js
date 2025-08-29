@@ -22,11 +22,16 @@ const Home = () => {
     totalUsers: 0,
     totalLikes: 0
   });
+  const [statsLoading, setStatsLoading] = useState(true);
 
   useEffect(() => {
     fetchArticles();
-    fetchAllArticlesForStats();
   }, [currentPage, searchTerm, sortBy, filterTag]);
+
+  useEffect(() => {
+    // Only fetch stats once when component mounts
+    fetchAllArticlesForStats();
+  }, []);
 
   useEffect(() => {
     if (articles.length > 0) {
@@ -96,20 +101,44 @@ const Home = () => {
 
   const fetchAllArticlesForStats = async () => {
     try {
-      // Fetch all articles for accurate community stats
-      const response = await api.get("/api/articles", { params: { limit: 1000 } });
-      const allArticles = response.data.articles;
+      setStatsLoading(true);
+      // Fetch all articles for accurate community stats (use a high limit to get all)
+      const response = await api.get("/api/articles", { params: { limit: 10000 } });
+      const allArticles = response.data.articles || [];
       
-      const totalLikes = allArticles.reduce((sum, article) => sum + (article.likes?.length || 0), 0);
-      const uniqueAuthors = new Set(allArticles.map(article => article.author?._id)).size;
+      console.log("Fetched articles for stats:", allArticles.length); // Debug log
+      console.log("Sample article:", allArticles[0]); // Debug log
       
-      setCommunityStats({
+      const totalLikes = allArticles.reduce((sum, article) => {
+        const likesCount = article.likes?.length || 0;
+        return sum + likesCount;
+      }, 0);
+      
+      const uniqueAuthors = new Set(
+        allArticles
+          .map(article => article.author?._id)
+          .filter(id => id) // Filter out null/undefined
+      ).size;
+      
+      const stats = {
         totalArticles: allArticles.length,
         totalUsers: uniqueAuthors,
         totalLikes: totalLikes
-      });
+      };
+      
+      console.log("Calculated stats:", stats); // Debug log
+      setCommunityStats(stats);
     } catch (error) {
       console.error("Error fetching articles for stats:", error);
+      console.error("Error details:", error.response?.data || error.message);
+      // Set default stats on error
+      setCommunityStats({
+        totalArticles: 0,
+        totalUsers: 0,
+        totalLikes: 0
+      });
+    } finally {
+      setStatsLoading(false);
     }
   };
 
@@ -117,6 +146,8 @@ const Home = () => {
     // 新しい記事を一覧に追加してフォームを閉じる
     setArticles([newArticle, ...articles]);
     setShowCreateForm(false);
+    // Refresh stats when new article is created
+    fetchAllArticlesForStats();
   };
 
   const handleSearch = (term) => {
@@ -187,19 +218,19 @@ const Home = () => {
           <div className="mt-12 sm:mt-16 grid grid-cols-3 gap-4 sm:gap-8 max-w-2xl mx-auto">
             <div className="text-center">
               <div className="text-2xl sm:text-4xl font-bold text-purple-600 mb-1 sm:mb-2">
-                {communityStats.totalArticles}+
+                {statsLoading ? "..." : `${communityStats.totalArticles || 0}+`}
               </div>
               <div className="text-xs sm:text-sm text-gray-600 font-medium">記事</div>
             </div>
             <div className="text-center">
               <div className="text-2xl sm:text-4xl font-bold text-blue-600 mb-1 sm:mb-2">
-                {communityStats.totalUsers}+
+                {statsLoading ? "..." : `${communityStats.totalUsers || 0}+`}
               </div>
               <div className="text-xs sm:text-sm text-gray-600 font-medium">ユーザー</div>
             </div>
             <div className="text-center">
               <div className="text-2xl sm:text-4xl font-bold text-pink-600 mb-1 sm:mb-2">
-                {communityStats.totalLikes}+
+                {statsLoading ? "..." : `${communityStats.totalLikes || 0}+`}
               </div>
               <div className="text-xs sm:text-sm text-gray-600 font-medium">いいね</div>
             </div>

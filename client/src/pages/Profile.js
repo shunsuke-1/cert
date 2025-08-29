@@ -128,30 +128,46 @@ const Profile = () => {
   }
 
   return (
-    <div className="max-w-4xl mx-auto">
+    <div className="max-w-6xl mx-auto px-4 py-8">
       {/* プロフィールセクション */}
-      <div className="bg-white rounded-lg shadow-md p-8 mb-8">
-        <div className="flex justify-between items-start mb-8">
-          <div>
-            <h1 className="text-3xl font-bold mb-2">{currentUser.username}</h1>
-            <p className="text-gray-600">{currentUser.email}</p>
-            <p className="text-sm text-gray-500 mt-2">
-              登録日:{" "}
-              {new Date(currentUser.createdAt).toLocaleDateString("ja-JP")}
-            </p>
-            <p className="mt-2">
-              <Link to="/following" className="text-blue-600 hover:underline">
-                フォロー中: {followingCount}人
-              </Link>{" "}
-              / フォロワー: {followersCount}人
-            </p>
+      <div className="card-modern p-6 sm:p-8 mb-8 relative overflow-hidden">
+        {/* Background Pattern */}
+        <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-purple-100 to-blue-100 rounded-full -translate-y-16 translate-x-16 opacity-50"></div>
+        <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-pink-100 to-yellow-100 rounded-full translate-y-12 -translate-x-12 opacity-50"></div>
+        <div className="relative z-10">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-8 space-y-4 sm:space-y-0">
+            <div className="flex items-start space-x-4">
+              <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white text-2xl sm:text-3xl font-bold">
+                {currentUser.username.charAt(0).toUpperCase()}
+              </div>
+              <div>
+                <h1 className="text-2xl sm:text-3xl font-display font-bold text-gray-900 mb-2">
+                  {currentUser.username}
+                </h1>
+                <p className="text-gray-600 mb-2">{currentUser.email}</p>
+                <p className="text-sm text-gray-500">
+                  📅 {new Date(currentUser.createdAt).toLocaleDateString("ja-JP")} から参加
+                </p>
+                <div className="flex items-center space-x-4 mt-3">
+                  <Link 
+                    to="/following" 
+                    className="text-purple-600 hover:text-purple-800 font-medium transition-colors"
+                  >
+                    👥 フォロー中: {followingCount}
+                  </Link>
+                  <span className="text-gray-600">
+                    ❤️ フォロワー: {followersCount}
+                  </span>
+                </div>
+              </div>
+            </div>
+            <button
+              onClick={() => setIsEditing(!isEditing)}
+              className={`${isEditing ? 'btn-secondary' : 'btn-primary'} px-4 py-2 text-sm sm:text-base w-full sm:w-auto`}
+            >
+              {isEditing ? "キャンセル" : "✏️ プロフィール編集"}
+            </button>
           </div>
-          <button
-            onClick={() => setIsEditing(!isEditing)}
-            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-          >
-            {isEditing ? "キャンセル" : "プロフィール編集"}
-          </button>
         </div>
 
         {/* 自己紹介と資格の編集 */}
@@ -327,20 +343,32 @@ const Profile = () => {
         )}
 
         {/* コミュニティ統計 */}
-        <div className="mt-8 pt-8 border-t">
-          <h2 className="text-xl font-semibold mb-4">コミュニティ統計</h2>
-          <div className="grid md:grid-cols-2 gap-4">
-            <div className="text-center p-4 bg-blue-50 rounded">
-              <div className="text-2xl font-bold text-blue-600">
-                {stats.totalLikes}
-              </div>
-              <div className="text-sm text-gray-600">獲得いいね数</div>
-            </div>
-            <div className="text-center p-4 bg-green-50 rounded">
-              <div className="text-2xl font-bold text-green-600">
+        <div className="relative z-10 mt-8 pt-8 border-t border-gray-200">
+          <h2 className="text-xl sm:text-2xl font-display font-bold text-gray-900 mb-6">📊 あなたの活動</h2>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            <div className="text-center p-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl">
+              <div className="text-2xl sm:text-3xl font-bold text-blue-600 mb-1">
                 {stats.articleCount}
               </div>
-              <div className="text-sm text-gray-600">投稿記事数</div>
+              <div className="text-xs sm:text-sm text-gray-600 font-medium">投稿記事</div>
+            </div>
+            <div className="text-center p-4 bg-gradient-to-br from-pink-50 to-pink-100 rounded-xl">
+              <div className="text-2xl sm:text-3xl font-bold text-pink-600 mb-1">
+                {stats.totalLikes}
+              </div>
+              <div className="text-xs sm:text-sm text-gray-600 font-medium">獲得いいね</div>
+            </div>
+            <div className="text-center p-4 bg-gradient-to-br from-green-50 to-green-100 rounded-xl">
+              <div className="text-2xl sm:text-3xl font-bold text-green-600 mb-1">
+                {profile.certifications.filter(c => c.status === 'passed').length}
+              </div>
+              <div className="text-xs sm:text-sm text-gray-600 font-medium">取得資格</div>
+            </div>
+            <div className="text-center p-4 bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl">
+              <div className="text-2xl sm:text-3xl font-bold text-purple-600 mb-1">
+                {profile.certifications.filter(c => c.status === 'studying').length}
+              </div>
+              <div className="text-xs sm:text-sm text-gray-600 font-medium">学習中</div>
             </div>
           </div>
         </div>

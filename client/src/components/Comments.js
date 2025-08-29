@@ -84,40 +84,57 @@ const Comments = ({ articleId }) => {
   };
 
   return (
-    <div className="mt-8 border-t pt-8">
-      <h3 className="text-xl font-semibold mb-6">
+    <div className="mt-12 border-t border-gray-200 pt-8">
+      <h3 className="text-2xl font-display font-bold text-gray-900 mb-8 flex items-center">
+        <svg className="w-6 h-6 mr-3 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+        </svg>
         コメント ({comments.length})
       </h3>
       {/* Comment Form */}
       {currentUser ? (
-        <form onSubmit={handleSubmitComment} className="mb-8">
-          <div className="mb-4">
-            <textarea
-              value={newComment}
-              onChange={(e) => setNewComment(e.target.value)}
-              placeholder="コメントを入力してください..."
-              className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500"
-              rows="3"
-              required
-            />
-          </div>
-          <button
-            type="submit"
-            disabled={submitting || !newComment.trim()}
-            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-50"
-          >
-            {submitting ? "コメント中..." : "コメントする"}
-          </button>
-        </form>
+        <div className="card-modern p-6 mb-8">
+          <form onSubmit={handleSubmitComment}>
+            <div className="mb-4">
+              <textarea
+                value={newComment}
+                onChange={(e) => setNewComment(e.target.value)}
+                placeholder="この記事についてどう思いますか？コメントを残してみましょう..."
+                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all duration-200 resize-none"
+                rows="4"
+                required
+              />
+            </div>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2 text-sm text-gray-500">
+                <div className="w-6 h-6 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full flex items-center justify-center text-white text-xs font-bold">
+                  {currentUser.username.charAt(0).toUpperCase()}
+                </div>
+                <span>{currentUser.username} としてコメント</span>
+              </div>
+              <button
+                type="submit"
+                disabled={submitting || !newComment.trim()}
+                className="btn-primary px-6 py-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {submitting ? "投稿中..." : "💬 コメントする"}
+              </button>
+            </div>
+          </form>
+        </div>
       ) : (
-        <div className="mb-8 p-4 bg-gray-50 rounded-lg text-center">
-          <p className="text-gray-600">
-            コメントするには{" "}
-            <Link to="/login" className="text-blue-600 hover:underline">
-              ログイン
-            </Link>{" "}
-            してください
+        <div className="card-modern p-8 mb-8 text-center">
+          <div className="text-4xl mb-4">💬</div>
+          <h4 className="text-lg font-semibold text-gray-900 mb-2">コメントに参加しよう</h4>
+          <p className="text-gray-600 mb-4">
+            この記事について意見を共有するには、ログインが必要です
           </p>
+          <Link 
+            to="/login" 
+            className="btn-primary px-6 py-2 inline-block"
+          >
+            ログインしてコメント
+          </Link>
         </div>
       )}
       {/* Comments List */}
@@ -133,42 +150,52 @@ const Comments = ({ articleId }) => {
             const isLiked =
               currentUser && comment.likes?.includes(currentUser.id);
             return (
-              <div key={comment._id} className="bg-gray-50 rounded-lg p-4">
-                <div className="flex justify-between items-start mb-2">
-                  <div className="flex items-center space-x-2">
-                    <span className="font-medium text-gray-900">
-                      {comment.author.username}
-                    </span>
-                    <span className="text-sm text-gray-500">
-                      {formatDate(comment.createdAt)}
-                    </span>
+              <div key={comment._id} className="card-modern p-6 hover:shadow-lg transition-shadow duration-200">
+                <div className="flex justify-between items-start mb-4">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-8 h-8 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full flex items-center justify-center text-white text-sm font-bold">
+                      {comment.author.username.charAt(0).toUpperCase()}
+                    </div>
+                    <div>
+                      <span className="font-semibold text-gray-900">
+                        {comment.author.username}
+                      </span>
+                      <div className="text-sm text-gray-500">
+                        {formatDate(comment.createdAt)}
+                      </div>
+                    </div>
                   </div>
                   {isAuthor && (
                     <button
                       onClick={() => handleDeleteComment(comment._id)}
-                      className="text-red-600 hover:text-red-800 text-sm"
+                      className="text-red-500 hover:text-red-700 text-sm px-2 py-1 rounded hover:bg-red-50 transition-colors"
                     >
-                      削除
+                      🗑️ 削除
                     </button>
                   )}
                 </div>
-                <p className="text-gray-700 mb-3 whitespace-pre-wrap">
+                <p className="text-gray-700 mb-4 whitespace-pre-wrap leading-relaxed">
                   {comment.content}
                 </p>
-                <div className="flex items-center space-x-4">
-                  {currentUser && (
-                    <button
-                      onClick={() => handleLikeComment(comment._id)}
-                      className={`flex items-center space-x-1 text-sm ${
-                        isLiked
-                          ? "text-red-600"
-                          : "text-gray-500 hover:text-red-600"
-                      }`}
-                    >
-                      <span>{isLiked ? "❤️" : ""}</span>
-                      <span>{comment.likes?.length || 0}</span>
-                    </button>
-                  )}
+                <div className="flex items-center justify-between border-t border-gray-100 pt-3">
+                  <div className="flex items-center space-x-4">
+                    {currentUser && (
+                      <button
+                        onClick={() => handleLikeComment(comment._id)}
+                        className={`flex items-center space-x-2 px-3 py-1.5 rounded-full text-sm font-medium transition-all duration-200 ${
+                          isLiked
+                            ? "bg-red-100 text-red-600"
+                            : "text-gray-500 hover:text-red-600 hover:bg-red-50"
+                        }`}
+                      >
+                        <span>{isLiked ? "❤️" : "🤍"}</span>
+                        <span>{comment.likes?.length || 0}</span>
+                      </button>
+                    )}
+                  </div>
+                  <div className="text-xs text-gray-400">
+                    #{comments.indexOf(comment) + 1}
+                  </div>
                 </div>
               </div>
             );

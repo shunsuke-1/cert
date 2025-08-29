@@ -91,45 +91,63 @@ const ArticleDetail = () => {
   const isLiked = currentUser && article.likes?.includes(currentUser.id);
 
   return (
-    <div className="max-w-4xl mx-auto">
+    <div className="max-w-4xl mx-auto px-4 py-8">
       <button
         onClick={() => navigate("/")}
-        className="mb-4 text-blue-600 hover:underline flex items-center"
+        className="mb-6 text-purple-600 hover:text-purple-800 flex items-center font-medium transition-colors duration-200"
       >
-        ← ホームに戻る
+        <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+        </svg>
+        ホームに戻る
       </button>
 
-      <article className="bg-white rounded-lg shadow-md p-8">
-        <header className="mb-6">
-          <h1 className="text-3xl font-bold text-gray-900 mb-4">
+      <article className="card-modern p-6 sm:p-8 relative overflow-hidden">
+        {/* Background decoration */}
+        <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-purple-100 to-transparent rounded-full -translate-y-16 translate-x-16 opacity-60"></div>
+        <header className="relative z-10 mb-8">
+          <h1 className="text-3xl sm:text-4xl font-display font-bold text-gray-900 mb-6 leading-tight">
             {article.title}
           </h1>
 
-          <div className="flex items-center justify-between text-sm text-gray-600 mb-4">
-            <div className="flex items-center space-x-4">
-              <span>
-                投稿者:{" "}
-                <Link to={`/users/${article.author._id}`}>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+            <div className="flex items-center space-x-4 text-sm text-gray-600">
+              <div className="flex items-center space-x-2">
+                <div className="w-8 h-8 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full flex items-center justify-center text-white text-sm font-bold">
+                  {article.author.username.charAt(0).toUpperCase()}
+                </div>
+                <Link 
+                  to={`/users/${article.author._id}`}
+                  className="font-medium hover:text-purple-600 transition-colors"
+                >
                   {article.author.username}
                 </Link>
-              </span>
+              </div>
+              <span className="text-gray-400">•</span>
               <span>{formatDate(article.createdAt)}</span>
-              <span> {article.views} 閲覧</span>
+              <span className="text-gray-400">•</span>
+              <span className="flex items-center space-x-1">
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
+                  <path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd"/>
+                </svg>
+                <span>{article.views} 閲覧</span>
+              </span>
             </div>
 
             {isAuthor && (
-              <div className="flex space-x-2">
+              <div className="flex space-x-3">
                 <button
                   onClick={() => navigate(`/articles/${id}/edit`)}
-                  className="text-blue-600 hover:text-blue-800"
+                  className="btn-secondary px-4 py-2 text-sm"
                 >
-                  編集
+                  ✏️ 編集
                 </button>
                 <button
                   onClick={handleDelete}
-                  className="text-red-600 hover:text-red-800"
+                  className="px-4 py-2 text-sm bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors"
                 >
-                  削除
+                  🗑️ 削除
                 </button>
               </div>
             )}
@@ -154,26 +172,37 @@ const ArticleDetail = () => {
           dangerouslySetInnerHTML={{ __html: article.content }}
         />
 
-        <footer className="border-t pt-4">
-          <div className="flex items-center justify-between">
+        <footer className="relative z-10 border-t border-gray-200 pt-6">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div className="flex items-center space-x-4">
               {currentUser && (
                 <button
                   onClick={handleLike}
-                  className={`flex items-center space-x-1 px-4 py-2 rounded ${
+                  className={`flex items-center space-x-2 px-6 py-3 rounded-full font-medium transition-all duration-200 ${
                     isLiked
-                      ? "bg-red-100 text-red-600"
+                      ? "bg-gradient-to-r from-pink-100 to-red-100 text-red-600 hover:from-pink-200 hover:to-red-200"
                       : "bg-gray-100 text-gray-600 hover:bg-gray-200"
                   }`}
                 >
-                  <span>{isLiked ? "❤️" : ""}</span>
-                  <span>{article.likes?.length || 0}</span>
+                  <span className="text-lg">{isLiked ? "❤️" : "🤍"}</span>
+                  <span>{article.likes?.length || 0} いいね</span>
                 </button>
               )}
+              <div className="flex items-center space-x-2 text-sm text-gray-500">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                </svg>
+                <span>コメントで議論しよう</span>
+              </div>
             </div>
             <div className="text-sm text-gray-500">
               {article.updatedAt !== article.createdAt && (
-                <span>最終更新: {formatDate(article.updatedAt)}</span>
+                <span className="flex items-center space-x-1">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                  </svg>
+                  <span>最終更新: {formatDate(article.updatedAt)}</span>
+                </span>
               )}
             </div>
           </div>

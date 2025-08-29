@@ -14,19 +14,33 @@ const Home = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [sortBy, setSortBy] = useState("newest");
+  const [filterTag, setFilterTag] = useState("");
+  const [popularTags, setPopularTags] = useState([]);
+  const [featuredArticles, setFeaturedArticles] = useState([]);
+  const [communityStats, setCommunityStats] = useState({
+    totalArticles: 0,
+    totalUsers: 0,
+    totalLikes: 0
+  });
 
   useEffect(() => {
-    // 検索ワードやページ番号が変わったら記事を再取得
     fetchArticles();
-  }, [currentPage, searchTerm]);
+    fetchPopularTags();
+    fetchFeaturedArticles();
+    fetchCommunityStats();
+  }, [currentPage, searchTerm, sortBy, filterTag]);
 
   const fetchArticles = async () => {
     try {
       setLoading(true);
-      const params = { page: currentPage, limit: 10 };
-      if (searchTerm) {
-        params.search = searchTerm;
-      }
+      const params = { 
+        page: currentPage, 
+        limit: 10,
+        sortBy,
+        ...(searchTerm && { search: searchTerm }),
+        ...(filterTag && { tag: filterTag })
+      };
       const response = await api.get("/api/articles", { params });
       setArticles(response.data.articles);
       setTotalPages(response.data.totalPages);
@@ -34,6 +48,33 @@ const Home = () => {
       console.error("Error fetching articles:", error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchPopularTags = async () => {
+    try {
+      const response = await api.get("/api/articles/popular-tags");
+      setPopularTags(response.data.slice(0, 10));
+    } catch (error) {
+      console.error("Error fetching popular tags:", error);
+    }
+  };
+
+  const fetchFeaturedArticles = async () => {
+    try {
+      const response = await api.get("/api/articles/featured");
+      setFeaturedArticles(response.data.slice(0, 3));
+    } catch (error) {
+      console.error("Error fetching featured articles:", error);
+    }
+  };
+
+  const fetchCommunityStats = async () => {
+    try {
+      const response = await api.get("/api/stats/community");
+      setCommunityStats(response.data);
+    } catch (error) {
+      console.error("Error fetching community stats:", error);
     }
   };
 
@@ -46,6 +87,18 @@ const Home = () => {
   const handleSearch = (term) => {
     setSearchTerm(term);
     setCurrentPage(1);
+    setFilterTag("");
+  };
+
+  const handleSortChange = (newSort) => {
+    setSortBy(newSort);
+    setCurrentPage(1);
+  };
+
+  const handleTagFilter = (tag) => {
+    setFilterTag(tag === filterTag ? "" : tag);
+    setCurrentPage(1);
+    setSearchTerm("");
   };
 
   const handleLike = (articleId, newLikeCount) => {
@@ -94,6 +147,28 @@ const Home = () => {
               </Link>
             </div>
           )}
+          
+          {/* Community Stats */}
+          <div className="mt-12 sm:mt-16 grid grid-cols-3 gap-4 sm:gap-8 max-w-2xl mx-auto">
+            <div className="text-center">
+              <div className="text-2xl sm:text-4xl font-bold text-purple-600 mb-1 sm:mb-2">
+                {communityStats.totalArticles}+
+              </div>
+              <div className="text-xs sm:text-sm text-gray-600 font-medium">記事</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl sm:text-4xl font-bold text-blue-600 mb-1 sm:mb-2">
+                {communityStats.totalUsers}+
+              </div>
+              <div className="text-xs sm:text-sm text-gray-600 font-medium">ユーザー</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl sm:text-4xl font-bold text-pink-600 mb-1 sm:mb-2">
+                {communityStats.totalLikes}+
+              </div>
+              <div className="text-xs sm:text-sm text-gray-600 font-medium">いいね</div>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -124,8 +199,91 @@ const Home = () => {
           </div>
         )}
 
-        {/* 検索バー */}
-        <SearchBar onSearch={handleSearch} />
+        {/* Featured Articles */}
+        {featuredArticles.length > 0 && !searchTerm && !filterTag && (
+          <div className="mb-8 sm:mb-12">
+            <h3 className="text-2xl sm:text-3xl font-display font-bold text-gray-900 mb-6 text-center">
+              ✨ 注目の記事
+            </h3>
+            <div className="grid md:grid-cols-3 gap-6">
+              {featuredArticles.map((article) => (
+                <div key={article._id} className="card-modern p-6 group hover:scale-105 transition-transform duration-300">
+                  <Link to={`/articles/${article._id}`}>
+                    <h4 className="font-display font-semibold text-lg text-gray-900 group-hover:text-purple-600 mb-3 line-clamp-2">
+                      {article.title}
+                    </h4>
+                    <p className="text-gray-600 text-sm line-clamp-3 mb-4">
+                      {article.excerpt}
+                    </p>
+                    <div className="flex items-center justify-between text-xs text-gray-500">
+                      <span>👁 {article.views || 0}</span>
+                      <span>❤️ {article.likes?.length || 0}</span>
+                    </div>
+                  </Link>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Search & Filters */}
+        <div className="space-y-4 sm:space-y-6">
+          <SearchBar onSearch={handleSearch} />
+          
+          {/* Sort and Filter Controls */}
+          <div className="card-modern p-4 sm:p-6">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div className="flex flex-wrap items-center gap-2 sm:gap-4">
+                <span className="text-sm font-medium text-gray-700">並び替え:</span>
+                <select
+                  value={sortBy}
+                  onChange={(e) => handleSortChange(e.target.value)}
+                  className="px-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-purple-500"
+                >
+                  <option value="newest">新着順</option>
+                  <option value="popular">人気順</option>
+                  <option value="mostLiked">いいね順</option>
+                  <option value="mostViewed">閲覧数順</option>
+                </select>
+              </div>
+              
+              {filterTag && (
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-gray-600">フィルター:</span>
+                  <span className="tag-modern text-sm">#{filterTag}</span>
+                  <button
+                    onClick={() => handleTagFilter("")}
+                    className="text-gray-500 hover:text-gray-700"
+                  >
+                    ✕
+                  </button>
+                </div>
+              )}
+            </div>
+            
+            {/* Popular Tags */}
+            {popularTags.length > 0 && (
+              <div className="mt-4 pt-4 border-t border-gray-200">
+                <span className="text-sm font-medium text-gray-700 mb-3 block">人気のタグ:</span>
+                <div className="flex flex-wrap gap-2">
+                  {popularTags.map((tag) => (
+                    <button
+                      key={tag._id}
+                      onClick={() => handleTagFilter(tag._id)}
+                      className={`tag-modern text-sm transition-all duration-200 ${
+                        filterTag === tag._id 
+                          ? 'bg-purple-200 border-purple-400 text-purple-800' 
+                          : 'hover:bg-purple-100'
+                      }`}
+                    >
+                      #{tag._id} ({tag.count})
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
 
         {/* 記事リスト */}
         {loading ? (

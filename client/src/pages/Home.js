@@ -238,6 +238,55 @@ const Home = () => {
         </div>
       </section>
 
+      {/* Study Features Section */}
+      {currentUser && (
+        <section className="max-w-6xl mx-auto px-4 py-8">
+          <div className="text-center mb-8">
+            <h2 className="text-2xl sm:text-3xl font-display font-bold text-gray-900 mb-2">
+              学習機能
+            </h2>
+            <p className="text-gray-700">資格学習を効率的に管理しよう</p>
+          </div>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <Link
+              to="/study-dashboard"
+              className="card-modern p-6 text-center hover:scale-105 transition-transform duration-200 group"
+            >
+              <div className="text-4xl mb-3 group-hover:scale-110 transition-transform">📚</div>
+              <h3 className="font-display font-bold text-gray-900 mb-2">学習ダッシュボード</h3>
+              <p className="text-sm text-gray-600">進捗を一目で確認</p>
+            </Link>
+            
+            <Link
+              to="/qualifications"
+              className="card-modern p-6 text-center hover:scale-105 transition-transform duration-200 group"
+            >
+              <div className="text-4xl mb-3 group-hover:scale-110 transition-transform">🎯</div>
+              <h3 className="font-display font-bold text-gray-900 mb-2">資格管理</h3>
+              <p className="text-sm text-gray-600">目標資格を設定</p>
+            </Link>
+            
+            <Link
+              to="/study-records/new"
+              className="card-modern p-6 text-center hover:scale-105 transition-transform duration-200 group"
+            >
+              <div className="text-4xl mb-3 group-hover:scale-110 transition-transform">✍️</div>
+              <h3 className="font-display font-bold text-gray-900 mb-2">学習記録</h3>
+              <p className="text-sm text-gray-600">今日の学習を記録</p>
+            </Link>
+            
+            <Link
+              to="/study-timeline"
+              className="card-modern p-6 text-center hover:scale-105 transition-transform duration-200 group"
+            >
+              <div className="text-4xl mb-3 group-hover:scale-110 transition-transform">📊</div>
+              <h3 className="font-display font-bold text-gray-900 mb-2">タイムライン</h3>
+              <p className="text-sm text-gray-600">みんなの学習記録</p>
+            </Link>
+          </div>
+        </section>
+      )}
+
       {/* 記事セクション */}
       <section className="max-w-6xl mx-auto px-4 py-8 sm:py-16">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 sm:mb-12 space-y-4 sm:space-y-0 sm:space-x-4">

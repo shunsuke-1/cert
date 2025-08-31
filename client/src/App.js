@@ -13,6 +13,10 @@ import Contact from "./pages/Contact";
 import Footer from "./components/Footer";
 import UserProfile from "./pages/UserProfile";
 import FollowingList from "./pages/FollowingList";
+import StudyDashboard from "./pages/StudyDashboard";
+import Qualifications from "./pages/Qualifications";
+import StudyTimeline from "./pages/StudyTimeline";
+import CreateStudyRecord from "./pages/CreateStudyRecord";
 
 function App() {
   return (
@@ -32,6 +36,10 @@ function App() {
               <Route path="/contact" element={<Contact />} />
               <Route path="/users/:id" element={<UserProfile />} />
               <Route path="/following" element={<FollowingList />} />
+              <Route path="/study-dashboard" element={<StudyDashboard />} />
+              <Route path="/qualifications" element={<Qualifications />} />
+              <Route path="/study-timeline" element={<StudyTimeline />} />
+              <Route path="/study-records/new" element={<CreateStudyRecord />} />
             </Routes>
           </main>
         </div>

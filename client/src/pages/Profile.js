@@ -25,6 +25,12 @@ const Profile = () => {
 
   // 統計 & フォロー数
   const [stats, setStats] = useState({ articleCount: 0, totalLikes: 0 });
+  const [studyStats, setStudyStats] = useState({ 
+    totalRecords: 0, 
+    totalHours: 0, 
+    activeQualifications: 0,
+    passedQualifications: 0 
+  });
   const [followersCount, setFollowersCount] = useState(0);
   const [followingCount, setFollowingCount] = useState(0);
 
@@ -35,6 +41,7 @@ const Profile = () => {
     }
     fetchMyArticles();
     fetchUserStats();
+    fetchStudyStats();
     fetchFollowCounts();
   }, [currentUser, navigate, currentPage]);
 
@@ -62,6 +69,32 @@ const Profile = () => {
       setStats(res.data);
     } catch (error) {
       console.error("Error fetching user stats:", error);
+    }
+  };
+
+  // 学習統計取得
+  const fetchStudyStats = async () => {
+    try {
+      // Get study records
+      const recordsRes = await api.get("/api/study-records/my-records", { params: { limit: 1000 } });
+      const records = recordsRes.data.records || [];
+      
+      // Get qualifications
+      const qualsRes = await api.get("/api/study-records/my-qualifications");
+      const qualifications = qualsRes.data || [];
+      
+      const totalHours = records.reduce((sum, record) => sum + (record.studyHours || 0), 0);
+      const activeQualifications = qualifications.filter(q => q.status === 'studying').length;
+      const passedQualifications = qualifications.filter(q => q.status === 'passed').length;
+      
+      setStudyStats({
+        totalRecords: records.length,
+        totalHours: totalHours,
+        activeQualifications: activeQualifications,
+        passedQualifications: passedQualifications
+      });
+    } catch (error) {
+      console.error("Error fetching study stats:", error);
     }
   };
 
@@ -345,7 +378,7 @@ const Profile = () => {
         {/* コミュニティ統計 */}
         <div className="relative z-10 mt-8 pt-8 border-t border-gray-200">
           <h2 className="text-xl sm:text-2xl font-display font-bold text-gray-900 mb-6">📊 あなたの活動</h2>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
             <div className="text-center p-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl">
               <div className="text-2xl sm:text-3xl font-bold text-blue-600 mb-1">
                 {stats.articleCount}
@@ -360,16 +393,93 @@ const Profile = () => {
             </div>
             <div className="text-center p-4 bg-gradient-to-br from-green-50 to-green-100 rounded-xl">
               <div className="text-2xl sm:text-3xl font-bold text-green-600 mb-1">
-                {profile.certifications.filter(c => c.status === 'passed').length}
+                {studyStats.passedQualifications}
               </div>
               <div className="text-xs sm:text-sm text-gray-600 font-medium">取得資格</div>
             </div>
             <div className="text-center p-4 bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl">
               <div className="text-2xl sm:text-3xl font-bold text-purple-600 mb-1">
-                {profile.certifications.filter(c => c.status === 'studying').length}
+                {studyStats.activeQualifications}
               </div>
               <div className="text-xs sm:text-sm text-gray-600 font-medium">学習中</div>
             </div>
+            <div className="text-center p-4 bg-gradient-to-br from-orange-50 to-orange-100 rounded-xl">
+              <div className="text-2xl sm:text-3xl font-bold text-orange-600 mb-1">
+                {studyStats.totalRecords}
+              </div>
+              <div className="text-xs sm:text-sm text-gray-600 font-medium">学習記録</div>
+            </div>
+            <div className="text-center p-4 bg-gradient-to-br from-indigo-50 to-indigo-100 rounded-xl">
+              <div className="text-2xl sm:text-3xl font-bold text-indigo-600 mb-1">
+                {studyStats.totalHours.toFixed(1)}h
+              </div>
+              <div className="text-xs sm:text-sm text-gray-600 font-medium">学習時間</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* 学習管理セクション */}
+      <div className="card-modern p-6 mb-8">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-xl sm:text-2xl font-display font-bold text-gray-900">📚 学習管理</h2>
+          <div className="flex gap-2">
+            <Link
+              to="/qualifications"
+              className="btn-secondary text-sm px-3 py-2"
+            >
+              資格管理
+            </Link>
+            <Link
+              to="/study-records/new"
+              className="btn-primary text-sm px-3 py-2"
+            >
+              記録を追加
+            </Link>
+          </div>
+        </div>
+        
+        <div className="grid sm:grid-cols-2 gap-6">
+          <div>
+            <h3 className="font-semibold text-gray-900 mb-3">🎯 学習中の資格</h3>
+            {studyStats.activeQualifications > 0 ? (
+              <div className="space-y-2">
+                <div className="text-sm text-gray-600">
+                  {studyStats.activeQualifications}件の資格を学習中
+                </div>
+                <Link
+                  to="/study-dashboard"
+                  className="text-purple-600 hover:text-purple-700 text-sm font-medium"
+                >
+                  詳細を見る →
+                </Link>
+              </div>
+            ) : (
+              <div className="text-sm text-gray-500">
+                まだ学習中の資格がありません
+              </div>
+            )}
+          </div>
+          
+          <div>
+            <h3 className="font-semibold text-gray-900 mb-3">📝 最近の学習記録</h3>
+            {studyStats.totalRecords > 0 ? (
+              <div className="space-y-2">
+                <div className="text-sm text-gray-600">
+                  {studyStats.totalRecords}件の記録を投稿
+                </div>
+                <Link
+                  to="/study-timeline"
+                  className="text-purple-600 hover:text-purple-700 text-sm font-medium"
+                >
+                  タイムラインを見る →
+                </Link>
+              </div>
+            ) : (
+              <div className="text-sm text-gray-500">
+                まだ学習記録がありません
+              </div>
+            )}
           </div>
         </div>
       </div>

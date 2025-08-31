@@ -23,19 +23,31 @@ const Navbar = () => {
           </Link>
 
           {currentUser ? (
-            <div className="flex items-center space-x-3 sm:space-x-6">
+            <div className="flex items-center space-x-2 sm:space-x-4">
+              <Link 
+                to="/study-dashboard" 
+                className="text-white/95 hover:text-white font-medium transition-colors duration-200 text-xs sm:text-sm"
+              >
+                📚 学習
+              </Link>
+              <Link 
+                to="/study-timeline" 
+                className="text-white/95 hover:text-white font-medium transition-colors duration-200 text-xs sm:text-sm"
+              >
+                📊 タイムライン
+              </Link>
               <Link 
                 to="/profile" 
                 className="text-white/95 hover:text-white font-medium transition-colors duration-200 flex items-center space-x-2"
               >
-                <div className="w-7 h-7 sm:w-8 sm:h-8 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full flex items-center justify-center text-xs sm:text-sm font-bold">
+                <div className="w-6 h-6 sm:w-8 sm:h-8 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full flex items-center justify-center text-xs sm:text-sm font-bold">
                   {currentUser.username.charAt(0).toUpperCase()}
                 </div>
-                <span className="hidden sm:block text-sm sm:text-base">{currentUser.username}</span>
+                <span className="hidden lg:block text-sm">{currentUser.username}</span>
               </Link>
               <button
                 onClick={handleLogout}
-                className="btn-secondary text-xs sm:text-sm px-3 sm:px-4 py-1.5 sm:py-2"
+                className="btn-secondary text-xs sm:text-sm px-2 sm:px-4 py-1 sm:py-2"
               >
                 ログアウト
               </button>

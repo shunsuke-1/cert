@@ -1,51 +1,58 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { AuthProvider } from "./contexts/AuthContext";
 import Navbar from "./components/Navbar";
+import Sidebar from "./components/Sidebar";
 import Home from "./pages/Home";
-import Login from "./pages/Login";
-import Register from "./pages/Register";
-import Profile from "./pages/Profile";
-import ArticleDetail from "./pages/ArticleDetail";
-import EditArticle from "./pages/EditArticle";
-import PrivacyPolicy from "./pages/PrivacyPolicy";
-import Contact from "./pages/Contact";
-import Footer from "./components/Footer";
-import UserProfile from "./pages/UserProfile";
-import FollowingList from "./pages/FollowingList";
-import StudyDashboard from "./pages/StudyDashboard";
-import Qualifications from "./pages/Qualifications";
-import StudyTimeline from "./pages/StudyTimeline";
-import CreateStudyRecord from "./pages/CreateStudyRecord";
+import BasicTypes from "./pages/BasicTypes";
+import Views from "./pages/Views";
+import Modifiers from "./pages/Modifiers";
+import Layout from "./pages/Layout";
+import Navigation from "./pages/Navigation";
+import DataFlow from "./pages/DataFlow";
+import Animation from "./pages/Animation";
+import Gestures from "./pages/Gestures";
+import Drawing from "./pages/Drawing";
+import Performance from "./pages/Performance";
+import Testing from "./pages/Testing";
+import AdminEditor from "./components/AdminEditor";
+import AdminAccess from "./components/AdminAccess";
+import "./index.css";
 
 function App() {
   return (
-    <AuthProvider>
-      <Router>
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
-          <Navbar />
-          <main className="container mx-auto px-4 py-8">
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/register" element={<Register />} />
-              <Route path="/profile" element={<Profile />} />
-              <Route path="/articles/:id" element={<ArticleDetail />} />
-              <Route path="/articles/:id/edit" element={<EditArticle />} />
-              <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-              <Route path="/contact" element={<Contact />} />
-              <Route path="/users/:id" element={<UserProfile />} />
-              <Route path="/following" element={<FollowingList />} />
-              <Route path="/study-dashboard" element={<StudyDashboard />} />
-              <Route path="/qualifications" element={<Qualifications />} />
-              <Route path="/study-timeline" element={<StudyTimeline />} />
-              <Route path="/study-records/new" element={<CreateStudyRecord />} />
-            </Routes>
-          </main>
-        </div>
-        <Footer />
-      </Router>
-    </AuthProvider>
+    <Router>
+      <Routes>
+        {/* Admin Route - Full Screen */}
+        <Route path="/admin" element={<AdminEditor />} />
+        
+        {/* Main Site Routes */}
+        <Route path="/*" element={
+          <div className="min-h-screen bg-white">
+            <AdminAccess />
+            <Navbar />
+            <div className="flex">
+              <Sidebar />
+              <main className="flex-1 max-w-4xl mx-auto px-6 py-8">
+                <Routes>
+                  <Route path="/" element={<Home />} />
+                  <Route path="/basic-types" element={<BasicTypes />} />
+                  <Route path="/views" element={<Views />} />
+                  <Route path="/modifiers" element={<Modifiers />} />
+                  <Route path="/layout" element={<Layout />} />
+                  <Route path="/navigation" element={<Navigation />} />
+                  <Route path="/data-flow" element={<DataFlow />} />
+                  <Route path="/animation" element={<Animation />} />
+                  <Route path="/gestures" element={<Gestures />} />
+                  <Route path="/drawing" element={<Drawing />} />
+                  <Route path="/performance" element={<Performance />} />
+                  <Route path="/testing" element={<Testing />} />
+                </Routes>
+              </main>
+            </div>
+          </div>
+        } />
+      </Routes>
+    </Router>
   );
 }
 

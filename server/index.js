@@ -14,6 +14,7 @@ const articleRoutes = require("./routes/articles");
 const commentRoutes = require("./routes/comments");
 const qualificationRoutes = require("./routes/qualifications");
 const studyRecordRoutes = require("./routes/studyRecords");
+const adminRoutes = require("./routes/admin");
 
 const app = express();
 app.use(helmet());
@@ -46,6 +47,7 @@ app.use("/api/articles", articleRoutes);
 app.use("/api/comments", commentRoutes);
 app.use("/api/qualifications", qualificationRoutes);
 app.use("/api/study-records", studyRecordRoutes);
+app.use("/api/admin", adminRoutes);
 
 // Database connection
 mongoose
